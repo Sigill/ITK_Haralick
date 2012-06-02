@@ -18,10 +18,6 @@ typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
 typedef typename OffsetVector::Pointer OffsetVectorPointer;
 
-typedef typename NeighborhoodIterator::NeighborIndexType NeighborIndexType;
-typedef itk::VectorContainer< unsigned char, NeighborIndexType > NeighborIndexVector;
-typedef NeighborIndexVector::Pointer NeighborIndexVectorPointer;
-
 int main(int argc, char **argv)
 {
   ImageType::Pointer image = ImageType::New();
@@ -58,7 +54,7 @@ int main(int argc, char **argv)
     offsets->push_back(off);
   }
 
-  NeighborhoodIterator::RadiusType offsetsRadius; offsetsRadius.Fill(0);
+  ImageType::OffsetType offsetsRadius; offsetsRadius.Fill(0);
   {
     OffsetVector::ConstIterator off_it;
     for ( off_it = offsets->Begin(); off_it != offsets->End(); off_it++ )
@@ -76,19 +72,6 @@ int main(int argc, char **argv)
 
   std::cout << "Offsets minimal radius: " << offsetsRadius << std::endl;
 
-  NeighborIndexVectorPointer offsetsIndexes = NeighborIndexVector::New();
-  {
-    NeighborhoodIterator::NeighborhoodType neighborhood;
-    neighborhood.SetRadius(offsetsRadius);
-
-    OffsetVector::ConstIterator off_it;
-    for ( off_it = offsets->Begin(); off_it != offsets->End(); off_it++ )
-    {
-      offsetsIndexes->push_back(neighborhood.GetNeighborhoodIndex(off_it.Value()));
-      std::cout << neighborhood.GetNeighborhoodIndex(off_it.Value()) << std::endl;
-    }
-  }
-
   ImageType::RegionType windowRegion;
   ImageType::IndexType windowIndex;
   ImageType::OffsetType windowRadius; windowRadius.Fill(3);
@@ -98,12 +81,9 @@ int main(int argc, char **argv)
 
   ImageType::IndexType pixelIndex;
 
-  NeighborIndexVector::ConstIterator off_it;
+  OffsetVector::ConstIterator off_it, off_it_begin = offsets->Begin(), off_it_end = offsets->End();
   PixelType centerPixelIntensity, offsetPixelIntensity;
-  NeighborIndexType offsetPixelNeighborIndex;
-  ImageType::IndexType offsetPixelIndex;
-
-  bool pixelInBounds;
+  ImageType::IndexType centerPixelIndex, offsetPixelIndex;
 
   ConstIteratorWidx iit(image, imageRegion);
   iit.GoToBegin();
@@ -116,26 +96,22 @@ int main(int argc, char **argv)
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
-    NeighborhoodIterator nit(offsetsRadius, image, windowRegion);
-    nit.NeedToUseBoundaryConditionOff();
-    nit.GoToBegin();
-    while(!nit.IsAtEnd()) {
-      centerPixelIntensity = nit.GetCenterPixel();
-      //std::cout << "\t" << nit.GetIndex() << std::endl;
-      for ( off_it = offsetsIndexes->Begin(); off_it != offsetsIndexes->End(); off_it++ )
+    ConstIteratorWidx wit(image, windowRegion);
+    wit.GoToBegin();
+    while(!wit.IsAtEnd())
+    {
+      centerPixelIndex = wit.GetIndex();
+
+      for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
       {
-        offsetPixelNeighborIndex = off_it.Value();
-        offsetPixelIndex = nit.GetIndex(offsetPixelNeighborIndex);
+        offsetPixelIndex = centerPixelIndex + off_it.Value();
 
-        if(!windowRegion.IsInside(offsetPixelIndex))
+        if(windowRegion.IsInside(offsetPixelIndex))
         {
-          //std::cout << "\t\t" << offsetPixelIndex << std::endl;
-          continue;
+          offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
         }
-        offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
       }
-
-      ++nit;
+      ++wit;
     }
 
     ++iit;
