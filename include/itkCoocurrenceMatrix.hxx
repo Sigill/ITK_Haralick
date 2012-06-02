@@ -13,7 +13,6 @@ void
 CoocurrenceMatrix< TValueType, TFrequencyType >
 ::Initialize(const unsigned int size)
 {
-  m_Size = size;
 }
 
 } // End namespace Statistics

@@ -35,7 +35,7 @@ public:
     m_Size = size;
     if(size > 0)
     {
-      FrequencyContainer::resize(m_Size);
+      FrequencyContainer::resize(m_Size * m_Size);
       Reset();
     }
   }
@@ -56,10 +56,28 @@ public:
   inline void IncrementFrequency(const ValueType v1, const ValueType v2)
   {
     FrequencyContainer::operator[](ComputeOffset(v1, v2)) += 1;
+    ++m_TotalFrequency;
   }
 
-  using FrequencyContainer::begin;
-  using FrequencyContainer::end;
+  void Normalize() {
+    typename FrequencyContainer::iterator it = FrequencyContainer::begin(),
+             end = FrequencyContainer::end();
+    while(it < end)
+    {
+      *it /= m_TotalFrequency;
+      ++it;
+    }
+  }
+
+  inline ConstIterator begin()
+  {
+    return FrequencyContainer::begin();
+  }
+
+  inline ConstIterator end()
+  {
+    return FrequencyContainer::end();
+  }
 
 private:
   unsigned int m_Size;

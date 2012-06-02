@@ -125,19 +125,16 @@ int main(int argc, char **argv)
       ++wit;
     }
 
+    coocurrenceMatrix.Normalize();
+
     /*
-    HistogramType::ConstIterator histogramIterator = coocurrenceMatrix->Begin();
-
-    while( histogramIterator  != coocurrenceMatrix->End() )
+    typename CoocurrenceMatrixType::ConstIterator begin = coocurrenceMatrix.begin(), it = coocurrenceMatrix.begin(), end = coocurrenceMatrix.end();
+    while(it < end)
     {
-      std::cout << "Index = " << coocurrenceMatrix->GetIndex(histogramIterator.GetMeasurementVector())
-        << " Histogram cell center = " << histogramIterator.GetMeasurementVector()
-        << " Frequency = " << histogramIterator.GetFrequency() << std::endl;
-
-      ++histogramIterator ;
+      std::cout << (it - begin) << " -> " << *it << std::endl;
+      ++it;
     }
-
-    std::cout << "Total frequency: " << coocurrenceMatrix->GetTotalFrequency() << std::endl;
+    exit(0);
     */
 
 
