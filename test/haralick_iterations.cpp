@@ -2,6 +2,7 @@
 #include <itkVectorContainer.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkConstNeighborhoodIterator.h>
+#include <itkHistogram.h>
 
 const unsigned int W = 16;
 const unsigned int H = 16;
@@ -17,6 +18,10 @@ typedef itk::ConstNeighborhoodIterator< ImageType > NeighborhoodIterator;
 typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
 typedef typename OffsetVector::Pointer OffsetVectorPointer;
+
+typedef itk::Statistics::Histogram< float, itk::Statistics::DenseFrequencyContainer2 > HistogramType;
+typedef typename HistogramType::Pointer                            HistogramPointer;
+typedef typename HistogramType::ConstPointer                       HistogramConstPointer;
 
 int main(int argc, char **argv)
 {
@@ -79,11 +84,30 @@ int main(int argc, char **argv)
 
   std::cout << "Window size: " << windowSize << std::endl;
 
+
+  HistogramPointer coocurrenceMatrix = HistogramType::New();
+  {
+    coocurrenceMatrix->SetMeasurementVectorSize(2); // Because it's a coocurrence matrix
+
+    typename HistogramType::SizeType size( coocurrenceMatrix->GetMeasurementVectorSize() );
+    size.Fill(16); // Number of colors
+
+    typename HistogramType::MeasurementVectorType lowerBound, upperBound;
+    lowerBound.SetSize(coocurrenceMatrix->GetMeasurementVectorSize());
+    upperBound.SetSize(coocurrenceMatrix->GetMeasurementVectorSize());
+    lowerBound.Fill(0);
+    upperBound.Fill(16);
+    coocurrenceMatrix->Initialize(size, lowerBound, upperBound);
+  }
+
   ImageType::IndexType pixelIndex;
 
   OffsetVector::ConstIterator off_it, off_it_begin = offsets->Begin(), off_it_end = offsets->End();
   PixelType centerPixelIntensity, offsetPixelIntensity;
   ImageType::IndexType centerPixelIndex, offsetPixelIndex;
+  typename HistogramType::MeasurementVectorType cooc1, cooc2;
+  cooc1.SetSize(coocurrenceMatrix->GetMeasurementVectorSize());
+  cooc2.SetSize(coocurrenceMatrix->GetMeasurementVectorSize());
 
   ConstIteratorWidx iit(image, imageRegion);
   iit.GoToBegin();
@@ -96,11 +120,16 @@ int main(int argc, char **argv)
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
+    coocurrenceMatrix->SetToZero();
+
     ConstIteratorWidx wit(image, windowRegion);
     wit.GoToBegin();
     while(!wit.IsAtEnd())
     {
       centerPixelIndex = wit.GetIndex();
+      centerPixelIntensity = image->GetPixel(centerPixelIndex);
+      cooc1[0] = centerPixelIntensity;
+      cooc2[1] = centerPixelIntensity;
 
       for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
       {
@@ -109,10 +138,31 @@ int main(int argc, char **argv)
         if(windowRegion.IsInside(offsetPixelIndex))
         {
           offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
+          cooc1[1] = offsetPixelIntensity;
+          cooc2[0] = offsetPixelIntensity;
+
+          coocurrenceMatrix->IncreaseFrequencyOfMeasurement(cooc1, 1);
+          coocurrenceMatrix->IncreaseFrequencyOfMeasurement(cooc2, 1);
         }
       }
       ++wit;
     }
+
+    /*
+    HistogramType::ConstIterator histogramIterator = coocurrenceMatrix->Begin();
+
+    while( histogramIterator  != coocurrenceMatrix->End() )
+    {
+      std::cout << "Index = " << coocurrenceMatrix->GetIndex(histogramIterator.GetMeasurementVector())
+        << " Histogram cell center = " << histogramIterator.GetMeasurementVector()
+        << " Frequency = " << histogramIterator.GetFrequency() << std::endl;
+
+      ++histogramIterator ;
+    }
+
+    std::cout << "Total frequency: " << coocurrenceMatrix->GetTotalFrequency() << std::endl;
+    */
+
 
     ++iit;
   }
