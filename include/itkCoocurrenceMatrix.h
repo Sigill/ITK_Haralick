@@ -67,6 +67,7 @@ public:
       *it /= m_TotalFrequency;
       ++it;
     }
+    m_TotalFrequency = 1;
   }
 
   inline ConstIterator begin()
