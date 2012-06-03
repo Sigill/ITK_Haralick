@@ -23,4 +23,11 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(coocurrence_matrix ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
-#target_link_libraries(basic ${ITK_LIBRARIES})
+add_executable(filters test/filters.cpp)
+ 
+if( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(filters ITKReview ${ITK_LIBRARIES})
+else( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(filters ${ITK_LIBRARIES})
+endif( "${ITK_VERSION_MAJOR}" LESS 4 )
+
