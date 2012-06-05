@@ -48,7 +48,17 @@ int main(int argc, char **argv)
 
 
   Image2DCoocurrenceMatrixComputer::Pointer coocurrenceMatrixComputer = Image2DCoocurrenceMatrixComputer::New();
+
+  Image2DType::RegionType roi;
+  Image2DType::IndexType rIndex = {{ 0, 0 }};
+  Image2DType::SizeType rSize = {{ 8, 8 }};
+
+  roi.SetSize( rSize );
+  roi.SetIndex( rIndex );
+
   coocurrenceMatrixComputer->SetNumberOfBinsPerAxis(4); //reasonable number of bins
+
+  coocurrenceMatrixComputer->SetRegionOfInterest(roi);
 
   coocurrenceMatrixComputer->SetInput(image);
 

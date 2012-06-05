@@ -152,11 +152,11 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   // Now fill in the histogram
   if ( maskImage != NULL )
     {
-    this->FillCoocurrenceMatrixWithMask(radius, input->GetRequestedRegion(), maskImage);
+    this->FillCoocurrenceMatrixWithMask(radius, maskImage);
     }
   else
     {
-    this->FillCoocurrenceMatrix( radius, input->GetRequestedRegion() );
+    this->FillCoocurrenceMatrix( radius );
     }
 
   // Normalizse the histogram if requested
@@ -168,8 +168,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
 
 template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(RadiusType radius,
-                                                                                     RegionType region)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(RadiusType radius)
 {
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
@@ -181,7 +180,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(Radiu
 
   typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
   NeighborhoodIteratorType neighborIt;
-  neighborIt = NeighborhoodIteratorType(radius, input, region);
+  neighborIt = NeighborhoodIteratorType(radius, input, m_RegionOfInterest);
 
   for ( neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt )
     {
@@ -222,7 +221,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(Radiu
 template< class TImageType >
 void
 ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMask(RadiusType radius,
-                                                                                             RegionType region,
                                                                                              const ImageType *maskImage)
 {
   // Iterate over all of those pixels and offsets, adding each
@@ -237,8 +235,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMa
   // co-occurrence pair to the histogram
   typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
   NeighborhoodIteratorType neighborIt, maskNeighborIt;
-  neighborIt = NeighborhoodIteratorType(radius, input, region);
-  maskNeighborIt = NeighborhoodIteratorType(radius, maskImage, region);
+  neighborIt = NeighborhoodIteratorType(radius, input, m_RegionOfInterest);
+  maskNeighborIt = NeighborhoodIteratorType(radius, maskImage, m_RegionOfInterest);
 
   for ( neighborIt.GoToBegin(), maskNeighborIt.GoToBegin();
         !neighborIt.IsAtEnd(); ++neighborIt, ++maskNeighborIt )

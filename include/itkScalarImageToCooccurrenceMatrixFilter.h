@@ -141,6 +141,9 @@ public:
   }
   itkGetConstMacro(NumberOfBinsPerAxis, unsigned int);
 
+  itkSetMacro(RegionOfInterest, RegionType);
+  itkGetConstMacro(RegionOfInterest, RegionType);
+
   /** Set the calculator to normalize the histogram (divide all bins by the
     total frequency). Normalization is off by default. */
   itkSetMacro(Normalize, bool);
@@ -171,9 +174,9 @@ protected:
   virtual ~ScalarImageToCooccurrenceMatrixFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-  virtual void FillCoocurrenceMatrix(RadiusType radius, RegionType region);
+  virtual void FillCoocurrenceMatrix(RadiusType radius);
 
-  virtual void FillCoocurrenceMatrixWithMask(RadiusType radius, RegionType region, const ImageType *maskImage);
+  virtual void FillCoocurrenceMatrixWithMask(RadiusType radius, const ImageType *maskImage);
 
   /** Standard itk::ProcessObject subclass method. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -195,6 +198,8 @@ private:
   void NormalizeCoocurrenceMatrix(void);
 
   OffsetVectorConstPointer m_Offsets;
+
+  RegionType m_RegionOfInterest;
 
   unsigned int          m_NumberOfBinsPerAxis;
   bool                  m_Normalize;
