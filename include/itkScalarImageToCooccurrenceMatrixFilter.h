@@ -126,7 +126,17 @@ public:
 
   /** Set the offset or offsets over which the co-occurrence pairs will be computed.
       Calling either of these methods clears the previous offsets. */
-  itkSetConstObjectMacro(Offsets, OffsetVector);
+  virtual void SetOffsets (const OffsetVector * _arg)
+  {
+    itkDebugMacro("setting " << "Offsets" " to " << _arg);
+    if ( this->m_Offsets != _arg )
+      {
+      this->m_Offsets = _arg;
+      this->Modified();
+      this->ComputeOffsetsMinRadius();
+      }
+  }
+
   itkGetConstObjectMacro(Offsets, OffsetVector);
   void SetOffset(const OffsetType offset);
 
@@ -174,9 +184,9 @@ protected:
   virtual ~ScalarImageToCooccurrenceMatrixFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-  virtual void FillCoocurrenceMatrix(RadiusType radius);
+  virtual void FillCoocurrenceMatrix(void);
 
-  virtual void FillCoocurrenceMatrixWithMask(RadiusType radius, const ImageType *maskImage);
+  virtual void FillCoocurrenceMatrixWithMask(const ImageType *maskImage);
 
   /** Standard itk::ProcessObject subclass method. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -197,7 +207,10 @@ private:
 
   void NormalizeCoocurrenceMatrix(void);
 
+  void ComputeOffsetsMinRadius(void);
+
   OffsetVectorConstPointer m_Offsets;
+  RadiusType m_OffsetsMinRadius;
 
   RegionType m_RegionOfInterest;
 

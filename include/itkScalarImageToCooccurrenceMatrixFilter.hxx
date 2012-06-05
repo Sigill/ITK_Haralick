@@ -122,24 +122,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   // checks the number of required input to be non-NULL pointers before
   // calling this GenerateData() method.
 
-  // Next, find the minimum radius that encloses all the offsets.
-  unsigned int minRadius = 0;
-  typename OffsetVector::ConstIterator offsets;
-  for ( offsets = m_Offsets->Begin(); offsets != m_Offsets->End(); offsets++ )
-    {
-    for ( unsigned int i = 0; i < offsets.Value().GetOffsetDimension(); i++ )
-      {
-      unsigned int distance = vnl_math_abs(offsets.Value()[i]);
-      if ( distance > minRadius )
-        {
-        minRadius = distance;
-        }
-      }
-    }
-
-  RadiusType radius;
-  radius.Fill(minRadius);
-
   const ImageType *maskImage = NULL;
 
   // Check if a mask image has been provided
@@ -152,11 +134,11 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   // Now fill in the histogram
   if ( maskImage != NULL )
     {
-    this->FillCoocurrenceMatrixWithMask(radius, maskImage);
+    this->FillCoocurrenceMatrixWithMask(maskImage);
     }
   else
     {
-    this->FillCoocurrenceMatrix( radius );
+    this->FillCoocurrenceMatrix();
     }
 
   // Normalizse the histogram if requested
@@ -168,7 +150,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
 
 template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(RadiusType radius)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(void)
 {
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
@@ -180,7 +162,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(Radiu
 
   typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
   NeighborhoodIteratorType neighborIt;
-  neighborIt = NeighborhoodIteratorType(radius, input, m_RegionOfInterest);
+  neighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, input, m_RegionOfInterest);
 
   for ( neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt )
     {
@@ -220,8 +202,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(Radiu
 
 template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMask(RadiusType radius,
-                                                                                             const ImageType *maskImage)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMask(const ImageType *maskImage)
 {
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
@@ -235,8 +216,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMa
   // co-occurrence pair to the histogram
   typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
   NeighborhoodIteratorType neighborIt, maskNeighborIt;
-  neighborIt = NeighborhoodIteratorType(radius, input, m_RegionOfInterest);
-  maskNeighborIt = NeighborhoodIteratorType(radius, maskImage, m_RegionOfInterest);
+  neighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, input, m_RegionOfInterest);
+  maskNeighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, maskImage, m_RegionOfInterest);
 
   for ( neighborIt.GoToBegin(), maskNeighborIt.GoToBegin();
         !neighborIt.IsAtEnd(); ++neighborIt, ++maskNeighborIt )
@@ -294,6 +275,28 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::NormalizeCoocurrenceMatrix(
     static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   output->Normalize();
+}
+
+template< class TImageType >
+void
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::ComputeOffsetsMinRadius(void)
+{
+  unsigned int distance, i;
+  typename OffsetVector::ConstIterator off_it;
+
+  m_OffsetsMinRadius.Fill(0);
+
+  for ( off_it = m_Offsets->Begin(); off_it != m_Offsets->End(); off_it++ )
+  {
+    for ( i = 0; i < ::itk::GetImageDimension< ImageType >::ImageDimension; i++ )
+    {
+      distance = vnl_math_abs(off_it.Value()[i]);
+      if ( distance > m_OffsetsMinRadius[i] )
+      {
+        m_OffsetsMinRadius[i] = distance;
+      }
+    }
+  }
 }
 
 template< class TImageType >
