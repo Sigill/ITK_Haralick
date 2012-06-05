@@ -82,7 +82,8 @@ int main(int argc, char **argv)
 
   std::cout << "Window size: " << windowSize << std::endl;
 
-  CoocurrenceMatrixType coocurrenceMatrix = CoocurrenceMatrixType(16);
+  typename CoocurrenceMatrixType::Pointer coocurrenceMatrix = CoocurrenceMatrixType::New();
+  coocurrenceMatrix->SetSize(16);
 
   ImageType::IndexType pixelIndex;
 
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
-    coocurrenceMatrix.Reset();
+    coocurrenceMatrix->Reset();
 
     ConstIteratorWidx wit(image, windowRegion);
     wit.GoToBegin();
@@ -118,14 +119,14 @@ int main(int argc, char **argv)
         {
           offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
 
-          coocurrenceMatrix.IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
-          coocurrenceMatrix.IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          coocurrenceMatrix->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
+          coocurrenceMatrix->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
         }
       }
       ++wit;
     }
 
-    coocurrenceMatrix.Normalize();
+    coocurrenceMatrix->Normalize();
 
     /*
     typename CoocurrenceMatrixType::ConstIterator begin = coocurrenceMatrix.begin(), it = coocurrenceMatrix.begin(), end = coocurrenceMatrix.end();

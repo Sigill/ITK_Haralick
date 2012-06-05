@@ -3,11 +3,11 @@
 
 #include <vector>
 
-#include <itkObject.h>
-#include <itkObjectFactory.h>
-#include <itkMacro.h>
-#include <itkSmartPointer.h>
-#include <itkNumericTraits.h>
+#include "itkMacro.h"
+#include "itkObjectFactory.h"
+#include "itkDataObject.h"
+#include "itkSmartPointer.h"
+#include "itkNumericTraits.h"
 
 namespace itk
 {
@@ -15,37 +15,42 @@ namespace Statistics
 {
 
 template< class TValueType = unsigned int, class TFrequencyType = float > 
-class CoocurrenceMatrix:private std::vector<TFrequencyType>
+class CoocurrenceMatrix:private std::vector<TFrequencyType>, public DataObject
 {
 public:
+
+  /** Standard class typedefs */
+  typedef CoocurrenceMatrix          Self;
+  typedef DataObject                 Superclass;
+  typedef SmartPointer< Self >       Pointer;
+  typedef SmartPointer< const Self > ConstPointer;
+
+  /** Run-time type information (and related methods) */
+  itkTypeMacro(CoocurrenceMatrix, DataObject);
 
   typedef TValueType ValueType;
   typedef TFrequencyType FrequencyType;
   typedef std::vector<FrequencyType> FrequencyContainer;
   typedef typename FrequencyContainer::const_iterator ConstIterator;
 
-  CoocurrenceMatrix(const unsigned int size = 0)
+  CoocurrenceMatrix()
     :FrequencyContainer()
-  {
-    SetSize(size);
-  }
+  {}
 
-  inline void SetSize(const unsigned int size)
+  itkNewMacro(Self);
+
+
+  void SetSize(const unsigned int size)
   {
     m_Size = size;
-    if(size > 0)
-    {
-      FrequencyContainer::resize(m_Size * m_Size);
-      Reset();
-    }
+    FrequencyContainer::resize(m_Size * m_Size);
+    Reset();
   }
 
-  inline unsigned int GetSize(void)
+  inline unsigned int GetSize(void) const
   {
     return m_Size;
   }
-
-  void Initialize(const unsigned int size);
 
   inline void Reset()
   {
@@ -70,12 +75,12 @@ public:
     m_TotalFrequency = 1;
   }
 
-  inline ConstIterator begin()
+  inline ConstIterator Begin(void) const
   {
     return FrequencyContainer::begin();
   }
 
-  inline ConstIterator end()
+  inline ConstIterator End(void) const
   {
     return FrequencyContainer::end();
   }

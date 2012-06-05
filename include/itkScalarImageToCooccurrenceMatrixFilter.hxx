@@ -27,31 +27,13 @@ namespace itk
 {
 namespace Statistics
 {
-template< class TImageType, class THistogramFrequencyContainer >
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::ScalarImageToCooccurrenceMatrixFilter()
+template< class TImageType >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::ScalarImageToCooccurrenceMatrixFilter()
 {
   this->SetNumberOfRequiredInputs(1);
   this->SetNumberOfRequiredOutputs(1);
 
   this->ProcessObject::SetNthOutput( 0, this->MakeOutput(0) );
-
-  // constant for a coocurrence matrix.
-  const unsigned int measurementVectorSize = 2;
-
-  HistogramType *output = const_cast< HistogramType * >( this->GetOutput() );
-
-  output->SetMeasurementVectorSize(measurementVectorSize);
-
-  //initialize parameters
-  this->m_LowerBound.SetSize(measurementVectorSize);
-  this->m_UpperBound.SetSize(measurementVectorSize);
-
-  this->m_LowerBound.Fill( NumericTraits< PixelType >::NonpositiveMin() );
-  this->m_UpperBound.Fill(NumericTraits< PixelType >::max() + 1);
-
-  this->m_Min = NumericTraits< PixelType >::NonpositiveMin();
-  this->m_Max = NumericTraits< PixelType >::max();
 
   //mask inside pixel value
   this->m_InsidePixelValue = NumericTraits< PixelType >::One;
@@ -60,10 +42,9 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
   this->m_Normalize = false;
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::SetOffset(const OffsetType offset)
 {
   OffsetVectorPointer offsetVector = OffsetVector::New();
@@ -72,10 +53,9 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
   this->SetOffsets(offsetVector);
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::SetInput(const ImageType *image)
 {
   // Process object is not const-correct so the const_cast is required here
@@ -83,10 +63,9 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
                                     const_cast< ImageType * >( image ) );
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::SetMaskImage(const ImageType *image)
 {
   // Process object is not const-correct so the const_cast is required here
@@ -94,67 +73,54 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
                                     const_cast< ImageType * >( image ) );
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 const TImageType *
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::GetInput() const
 {
   return static_cast< const ImageType * >( this->GetPrimaryInput() );
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 const TImageType *
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::GetMaskImage() const
 {
   return static_cast< const ImageType * >( this->ProcessObject::GetInput(1) );
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
-const typename ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                                      THistogramFrequencyContainer >::HistogramType *
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+template< class TImageType >
+const typename ScalarImageToCooccurrenceMatrixFilter< TImageType >::CoocurrenceMatrixType *
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::GetOutput() const
 {
-  const HistogramType *output =
-    static_cast< const HistogramType * >( this->ProcessObject::GetOutput(0) );
+  const CoocurrenceMatrixType *output =
+    static_cast< const CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   return output;
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
-typename ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                                THistogramFrequencyContainer >::DataObjectPointer
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >
+template< class TImageType >
+typename ScalarImageToCooccurrenceMatrixFilter< TImageType >::DataObjectPointer
+ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::MakeOutput( DataObjectPointerArraySizeType itkNotUsed(idx) )
 {
-  typename HistogramType::Pointer output = HistogramType::New();
-  return static_cast< DataObject * >( output );
+  typename CoocurrenceMatrixType::Pointer output = CoocurrenceMatrixType::New();
+  return static_cast< DataObject * >( output.GetPointer() );
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::GenerateData(void)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
 {
-  HistogramType *output =
-    static_cast< HistogramType * >( this->ProcessObject::GetOutput(0) );
+  CoocurrenceMatrixType *output =
+    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   const ImageType *input = this->GetInput();
 
   // At this point input must be non-NULL because the ProcessObject
   // checks the number of required input to be non-NULL pointers before
   // calling this GenerateData() method.
-
-  // First, create an appropriate histogram with the right number of bins
-  // and mins and maxes correct for the image type.
-  typename HistogramType::SizeType size( output->GetMeasurementVectorSize() );
-  size.Fill(m_NumberOfBinsPerAxis);
-  output->Initialize(size, m_LowerBound, m_UpperBound);
 
   // Next, find the minimum radius that encloses all the offsets.
   unsigned int minRadius = 0;
@@ -186,24 +152,23 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
   // Now fill in the histogram
   if ( maskImage != NULL )
     {
-    this->FillHistogramWithMask(radius, input->GetRequestedRegion(), maskImage);
+    this->FillCoocurrenceMatrixWithMask(radius, input->GetRequestedRegion(), maskImage);
     }
   else
     {
-    this->FillHistogram( radius, input->GetRequestedRegion() );
+    this->FillCoocurrenceMatrix( radius, input->GetRequestedRegion() );
     }
 
   // Normalizse the histogram if requested
   if ( m_Normalize )
     {
-    this->NormalizeHistogram();
+    this->NormalizeCoocurrenceMatrix();
     }
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::FillHistogram(RadiusType radius,
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(RadiusType radius,
                                                                                      RegionType region)
 {
   // Iterate over all of those pixels and offsets, adding each
@@ -211,20 +176,17 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
 
   const ImageType *input = this->GetInput();
 
-  HistogramType *output =
-    static_cast< HistogramType * >( this->ProcessObject::GetOutput(0) );
+  CoocurrenceMatrixType *output =
+    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
   NeighborhoodIteratorType neighborIt;
   neighborIt = NeighborhoodIteratorType(radius, input, region);
 
-  MeasurementVectorType cooccur( output->GetMeasurementVectorSize() );
-
   for ( neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt )
     {
     const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
-    if ( centerPixelIntensity < m_Min
-         || centerPixelIntensity > m_Max )
+    if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
       {
       continue; // don't put a pixel in the histogram if the value
                 // is out-of-bounds.
@@ -242,8 +204,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
         continue; // don't put a pixel in the histogram if it's out-of-bounds.
         }
 
-      if ( pixelIntensity < m_Min
-           || pixelIntensity > m_Max )
+      if ( pixelIntensity < 0 || pixelIntensity >= m_NumberOfBinsPerAxis)
         {
         continue; // don't put a pixel in the histogram if the value
                   // is out-of-bounds.
@@ -252,21 +213,15 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
       // Now make both possible co-occurrence combinations and increment the
       // histogram with them.
 
-      cooccur[0] = centerPixelIntensity;
-      cooccur[1] = pixelIntensity;
-      output->IncreaseFrequencyOfMeasurement(cooccur, 1);
-
-      cooccur[1] = centerPixelIntensity;
-      cooccur[0] = pixelIntensity;
-      output->IncreaseFrequencyOfMeasurement(cooccur, 1);
+      output->IncrementFrequency(centerPixelIntensity, pixelIntensity);
+      output->IncrementFrequency(pixelIntensity, centerPixelIntensity);
       }
     }
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::FillHistogramWithMask(RadiusType radius,
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMask(RadiusType radius,
                                                                                              RegionType region,
                                                                                              const ImageType *maskImage)
 {
@@ -275,8 +230,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
 
   const ImageType *input = this->GetInput();
 
-  HistogramType *output =
-    static_cast< HistogramType * >( this->ProcessObject::GetOutput(0) );
+  CoocurrenceMatrixType *output =
+    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
@@ -284,8 +239,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
   NeighborhoodIteratorType neighborIt, maskNeighborIt;
   neighborIt = NeighborhoodIteratorType(radius, input, region);
   maskNeighborIt = NeighborhoodIteratorType(radius, maskImage, region);
-
-  MeasurementVectorType cooccur( output->GetMeasurementVectorSize() );
 
   for ( neighborIt.GoToBegin(), maskNeighborIt.GoToBegin();
         !neighborIt.IsAtEnd(); ++neighborIt, ++maskNeighborIt )
@@ -297,8 +250,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
 
     const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
 
-    if ( centerPixelIntensity < this->GetMin()
-         || centerPixelIntensity > this->GetMax() )
+    if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
       {
       continue; // don't put a pixel in the histogram if the value
                 // is out-of-bounds.
@@ -321,8 +273,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
         continue; // don't put a pixel in the histogram if it's out-of-bounds.
         }
 
-      if ( pixelIntensity < this->GetMin()
-           || pixelIntensity > this->GetMax() )
+      if ( pixelIntensity < 0 || pixelIntensity > m_NumberOfBinsPerAxis )
         {
         continue; // don't put a pixel in the histogram if the value
                   // is out-of-bounds.
@@ -331,59 +282,29 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType,
       // Now make both possible co-occurrence combinations and increment the
       // histogram with them.
 
-      cooccur[0] = centerPixelIntensity;
-      cooccur[1] = pixelIntensity;
-      output->IncreaseFrequencyOfMeasurement(cooccur, 1);
-
-      cooccur[1] = centerPixelIntensity;
-      cooccur[0] = pixelIntensity;
-      output->IncreaseFrequencyOfMeasurement(cooccur, 1);
+      output->IncrementFrequency(centerPixelIntensity, pixelIntensity);
+      output->IncrementFrequency(pixelIntensity, centerPixelIntensity);
       }
     }
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::NormalizeHistogram(void)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::NormalizeCoocurrenceMatrix(void)
 {
-  HistogramType *output =
-    static_cast< HistogramType * >( this->ProcessObject::GetOutput(0) );
+  CoocurrenceMatrixType *output =
+    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
-  typename HistogramType::AbsoluteFrequencyType totalFrequency =
-    output->GetTotalFrequency();
-
-  typename HistogramType::Iterator hit = output->Begin();
-  while ( hit != output->End() )
-    {
-    hit.SetFrequency(hit.GetFrequency() / totalFrequency);
-    ++hit;
-    }
+  output->Normalize();
 }
 
-template< class TImageType, class THistogramFrequencyContainer >
+template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::SetPixelValueMinMax(PixelType min, PixelType max)
-{
-  itkDebugMacro("setting Min to " << min << "and Max to " << max);
-  m_Min = min;
-  m_Max = max;
-  m_LowerBound.Fill(min);
-  m_UpperBound.Fill(max + 1);
-  this->Modified();
-}
-
-template< class TImageType, class THistogramFrequencyContainer >
-void
-ScalarImageToCooccurrenceMatrixFilter< TImageType,
-                                       THistogramFrequencyContainer >::PrintSelf(std::ostream & os,
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::PrintSelf(std::ostream & os,
                                                                                  Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
   os << indent << "Offsets: " << this->GetOffsets() << std::endl;
-  os << indent << "Min: " << this->GetMin() << std::endl;
-  os << indent << "Max: " << this->GetMax() << std::endl;
   os << indent << "NumberOfBinsPerAxis: " << this->GetNumberOfBinsPerAxis() << std::endl;
   os << indent << "Normalize: " << this->GetNormalize() << std::endl;
   os << indent << "InsidePixelValue: " << this->GetInsidePixelValue() << std::endl;

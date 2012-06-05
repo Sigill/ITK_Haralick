@@ -19,7 +19,7 @@
 #define __itkScalarImageToCooccurrenceMatrixFilter_h
 
 #include "itkImage.h"
-#include "itkHistogram.h"
+#include "itkCoocurrenceMatrix.h"
 #include "itkVectorContainer.h"
 #include "itkNumericTraits.h"
 
@@ -89,8 +89,7 @@ namespace Statistics
  * \ingroup ITKStatistics
  */
 
-template< class TImageType,
-          class THistogramFrequencyContainer = DenseFrequencyContainer2 >
+template< class TImageType >
 class ITK_EXPORT ScalarImageToCooccurrenceMatrixFilter:public ProcessObject
 {
 public:
@@ -119,10 +118,9 @@ public:
 
   typedef typename NumericTraits< PixelType >::RealType MeasurementType;
 
-  typedef Histogram< MeasurementType, THistogramFrequencyContainer > HistogramType;
-  typedef typename HistogramType::Pointer                            HistogramPointer;
-  typedef typename HistogramType::ConstPointer                       HistogramConstPointer;
-  typedef typename HistogramType::MeasurementVectorType              MeasurementVectorType;
+  typedef CoocurrenceMatrix< PixelType, float> CoocurrenceMatrixType;
+  typedef typename CoocurrenceMatrixType::Pointer                            CoocurrenceMatrixPointer;
+  typedef typename CoocurrenceMatrixType::ConstPointer                       CoocurrenceMatrixConstPointer;
 
   itkStaticConstMacro(DefaultBinsPerAxis, unsigned int, 256);
 
@@ -133,15 +131,15 @@ public:
   void SetOffset(const OffsetType offset);
 
   /** Set number of histogram bins along each axis */
-  itkSetMacro(NumberOfBinsPerAxis, unsigned int);
+  void SetNumberOfBinsPerAxis(const unsigned int n)
+  {
+    m_NumberOfBinsPerAxis = n;
+    CoocurrenceMatrixType *output =
+      static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+
+    output->SetSize(m_NumberOfBinsPerAxis);
+  }
   itkGetConstMacro(NumberOfBinsPerAxis, unsigned int);
-
-  /** Set the min and max (inclusive) pixel value that will be placed in the
-    histogram */
-  void SetPixelValueMinMax(PixelType min, PixelType max);
-
-  itkGetConstMacro(Min, PixelType);
-  itkGetConstMacro(Max, PixelType);
 
   /** Set the calculator to normalize the histogram (divide all bins by the
     total frequency). Normalization is off by default. */
@@ -160,21 +158,22 @@ public:
 
   const ImageType * GetMaskImage() const;
 
-  /** method to get the Histogram */
-  const HistogramType * GetOutput() const;
+  /** method to get the CoocurrenceMatrix */
+  const CoocurrenceMatrixType * GetOutput() const;
 
   /** Set the pixel value of the mask that should be considered "inside" the
     object. Defaults to one. */
   itkSetMacro(InsidePixelValue, PixelType);
   itkGetConstMacro(InsidePixelValue, PixelType);
+
 protected:
   ScalarImageToCooccurrenceMatrixFilter();
   virtual ~ScalarImageToCooccurrenceMatrixFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-  virtual void FillHistogram(RadiusType radius, RegionType region);
+  virtual void FillCoocurrenceMatrix(RadiusType radius, RegionType region);
 
-  virtual void FillHistogramWithMask(RadiusType radius, RegionType region, const ImageType *maskImage);
+  virtual void FillCoocurrenceMatrixWithMask(RadiusType radius, RegionType region, const ImageType *maskImage);
 
   /** Standard itk::ProcessObject subclass method. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -193,15 +192,11 @@ private:
 
   // implemented
 
-  void NormalizeHistogram(void);
+  void NormalizeCoocurrenceMatrix(void);
 
   OffsetVectorConstPointer m_Offsets;
-  PixelType                m_Min;
-  PixelType                m_Max;
 
   unsigned int          m_NumberOfBinsPerAxis;
-  MeasurementVectorType m_LowerBound;
-  MeasurementVectorType m_UpperBound;
   bool                  m_Normalize;
 
   PixelType m_InsidePixelValue;

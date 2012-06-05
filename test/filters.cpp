@@ -48,9 +48,9 @@ int main(int argc, char **argv)
 
 
   Image2DCoocurrenceMatrixComputer::Pointer coocurrenceMatrixComputer = Image2DCoocurrenceMatrixComputer::New();
-  coocurrenceMatrixComputer->SetInput(image);
   coocurrenceMatrixComputer->SetNumberOfBinsPerAxis(4); //reasonable number of bins
-  coocurrenceMatrixComputer->SetPixelValueMinMax(0, 4);
+
+  coocurrenceMatrixComputer->SetInput(image);
 
   Image2DType::OffsetType offset1 = {{0, 1}};
   Image2DCoocurrenceMatrixComputer::OffsetVectorPointer offsetV = Image2DCoocurrenceMatrixComputer::OffsetVector::New();
@@ -66,20 +66,22 @@ int main(int argc, char **argv)
     //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
     //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
   }*/
-  const Image2DCoocurrenceMatrixComputer::HistogramType* hist = coocurrenceMatrixComputer->GetOutput();
+  const Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType* cooc = coocurrenceMatrixComputer->GetOutput();
 
-  Image2DCoocurrenceMatrixComputer::HistogramType::ConstIterator histIt = hist->Begin();
+  typename Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::ConstIterator coocIt = cooc->Begin(), coocBegin = cooc->Begin(), coocEnd = cooc->End();
 
-  while(histIt != hist->End())
+  while(coocIt != coocEnd)
   {
-    std::cout << histIt.GetIndex() << " -> " << histIt.GetFrequency() << std::endl;
-    ++histIt;
+    //std::cout << coocIt.GetIndex() << " -> " << coocIt.GetFrequency() << std::endl;
+    std::cout << ( (unsigned int)(coocIt - coocBegin) ) << " -> " << (*coocIt) << std::endl;
+    ++coocIt;
   }
 
-  Image2DCoocurrenceMatrixComputer::HistogramType::IndexType one_one( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::HistogramType::IndexType one_two( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::HistogramType::IndexType two_one( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::HistogramType::IndexType two_two( hist->GetMeasurementVectorSize() );
+  /*
+  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType one_one( hist->GetMeasurementVectorSize() );
+  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType one_two( hist->GetMeasurementVectorSize() );
+  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType two_one( hist->GetMeasurementVectorSize() );
+  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType two_two( hist->GetMeasurementVectorSize() );
 
   one_one[0] = 1;
   one_one[1] = 1;
@@ -105,5 +107,6 @@ int main(int argc, char **argv)
   std::cout << toF << std::endl;
   std::cout << ttF << std::endl;
   std::cout << totalF << std::endl;
+  */
 
 }
