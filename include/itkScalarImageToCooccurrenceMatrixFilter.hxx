@@ -19,8 +19,7 @@
 #define __itkScalarImageToCooccurrenceMatrixFilter_hxx
 
 #include "itkScalarImageToCooccurrenceMatrixFilter.h"
-
-#include "itkConstNeighborhoodIterator.h"
+#include "itkImageRegionConstIteratorWithIndex.h"
 #include "vnl/vnl_math.h"
 
 namespace itk
@@ -116,6 +115,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   CoocurrenceMatrixType *output =
     static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
+  output->Reset();
+
   const ImageType *input = this->GetInput();
 
   // At this point input must be non-NULL because the ProcessObject
@@ -160,44 +161,42 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(void)
   CoocurrenceMatrixType *output =
     static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
-  typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
-  NeighborhoodIteratorType neighborIt;
-  neighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, input, m_RegionOfInterest);
+  itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(input, m_RegionOfInterest);
+  PixelType centerPixelIntensity, offsetPixelIntensity;
+  typename ImageType::IndexType centerPixelIndex, offsetPixelIndex;
+  typename OffsetVector::ConstIterator off_it, off_it_begin = m_Offsets->Begin(), off_it_end = m_Offsets->End();
 
-  for ( neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt )
-    {
-    const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
+  iterator.GoToBegin();
+  while(!iterator.IsAtEnd())
+  {
+    centerPixelIndex = iterator.GetIndex();
+    centerPixelIntensity = input->GetPixel(centerPixelIndex);
     if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
       {
       continue; // don't put a pixel in the histogram if the value
                 // is out-of-bounds.
       }
 
-    typename OffsetVector::ConstIterator offsets;
-    for ( offsets = m_Offsets->Begin(); offsets != m_Offsets->End(); offsets++ )
+    for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
       {
-      bool            pixelInBounds;
-      const PixelType pixelIntensity =
-        neighborIt.GetPixel(offsets.Value(), pixelInBounds);
+        offsetPixelIndex = centerPixelIndex + off_it.Value();
 
-      if ( !pixelInBounds )
-        {
-        continue; // don't put a pixel in the histogram if it's out-of-bounds.
-        }
+        if(m_RegionOfInterest.IsInside(offsetPixelIndex))
+          {
+          offsetPixelIntensity = input->GetPixel(offsetPixelIndex);
 
-      if ( pixelIntensity < 0 || pixelIntensity >= m_NumberOfBinsPerAxis)
-        {
-        continue; // don't put a pixel in the histogram if the value
-                  // is out-of-bounds.
-        }
+          if ( offsetPixelIntensity < 0 || offsetPixelIntensity >= m_NumberOfBinsPerAxis )
+            {
+            continue; // don't put a pixel in the histogram if the value
+                      // is out-of-bounds.
+            }
 
-      // Now make both possible co-occurrence combinations and increment the
-      // histogram with them.
-
-      output->IncrementFrequency(centerPixelIntensity, pixelIntensity);
-      output->IncrementFrequency(pixelIntensity, centerPixelIntensity);
+          output->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
+          output->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          }
       }
-    }
+    ++iterator;
+  }
 }
 
 template< class TImageType >
@@ -212,59 +211,51 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMa
   CoocurrenceMatrixType *output =
     static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
-  // Iterate over all of those pixels and offsets, adding each
-  // co-occurrence pair to the histogram
-  typedef ConstNeighborhoodIterator< ImageType > NeighborhoodIteratorType;
-  NeighborhoodIteratorType neighborIt, maskNeighborIt;
-  neighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, input, m_RegionOfInterest);
-  maskNeighborIt = NeighborhoodIteratorType(m_OffsetsMinRadius, maskImage, m_RegionOfInterest);
+  itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(input, m_RegionOfInterest);
+  PixelType centerPixelIntensity, offsetPixelIntensity;
+  typename ImageType::IndexType centerPixelIndex, offsetPixelIndex;
+  typename OffsetVector::ConstIterator off_it, off_it_begin = m_Offsets->Begin(), off_it_end = m_Offsets->End();
 
-  for ( neighborIt.GoToBegin(), maskNeighborIt.GoToBegin();
-        !neighborIt.IsAtEnd(); ++neighborIt, ++maskNeighborIt )
-    {
-    if ( maskNeighborIt.GetCenterPixel() != m_InsidePixelValue )
+  iterator.GoToBegin();
+  while(!iterator.IsAtEnd())
+  {
+    centerPixelIndex = iterator.GetIndex();
+    if ( maskImage->GetPixel(centerPixelIndex) != m_InsidePixelValue )
       {
       continue; // Go to the next loop if we're not in the mask
       }
 
-    const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
-
+    centerPixelIntensity = input->GetPixel(centerPixelIndex);
     if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
       {
       continue; // don't put a pixel in the histogram if the value
                 // is out-of-bounds.
       }
 
-    typename OffsetVector::ConstIterator offsets;
-    for ( offsets = this->GetOffsets()->Begin(); offsets != this->GetOffsets()->End(); offsets++ )
+    for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
       {
-      if ( maskNeighborIt.GetPixel( offsets.Value() ) != m_InsidePixelValue )
-        {
-        continue; // Go to the next loop if we're not in the mask
-        }
+        offsetPixelIndex = centerPixelIndex + off_it.Value();
+        if(m_RegionOfInterest.IsInside(offsetPixelIndex))
+          {
+          if ( maskImage->GetPixel(offsetPixelIndex) != m_InsidePixelValue )
+            {
+            continue; // Go to the next loop if we're not in the mask
+            }
 
-      bool            pixelInBounds;
-      const PixelType pixelIntensity =
-        neighborIt.GetPixel(offsets.Value(), pixelInBounds);
+          offsetPixelIntensity = input->GetPixel(offsetPixelIndex);
 
-      if ( !pixelInBounds )
-        {
-        continue; // don't put a pixel in the histogram if it's out-of-bounds.
-        }
+          if ( offsetPixelIntensity < 0 || offsetPixelIntensity >= m_NumberOfBinsPerAxis )
+            {
+            continue; // don't put a pixel in the histogram if the value
+                      // is out-of-bounds.
+            }
 
-      if ( pixelIntensity < 0 || pixelIntensity > m_NumberOfBinsPerAxis )
-        {
-        continue; // don't put a pixel in the histogram if the value
-                  // is out-of-bounds.
-        }
-
-      // Now make both possible co-occurrence combinations and increment the
-      // histogram with them.
-
-      output->IncrementFrequency(centerPixelIntensity, pixelIntensity);
-      output->IncrementFrequency(pixelIntensity, centerPixelIntensity);
+          output->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
+          output->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          }
       }
-    }
+    ++iterator;
+  }
 }
 
 template< class TImageType >

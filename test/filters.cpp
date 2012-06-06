@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 
   Image2DType::RegionType roi;
   Image2DType::IndexType rIndex = {{ 0, 0 }};
-  Image2DType::SizeType rSize = {{ 8, 8 }};
+  Image2DType::SizeType rSize = {{ 32, 32 }};
 
   roi.SetSize( rSize );
   roi.SetIndex( rIndex );
@@ -69,13 +69,13 @@ int main(int argc, char **argv)
 
   coocurrenceMatrixComputer->Update();
 
-  /*
   for(int i = 0; i < 1000; ++i) 
   {
     image->Modified();
+    coocurrenceMatrixComputer->Update();
     //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
     //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
-  }*/
+  }
   const Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType* cooc = coocurrenceMatrixComputer->GetOutput();
 
   typename Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::ConstIterator coocIt = cooc->Begin(), coocBegin = cooc->Begin(), coocEnd = cooc->End();
