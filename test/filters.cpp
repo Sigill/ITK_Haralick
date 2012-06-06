@@ -3,6 +3,7 @@
 #include <itkImageRegionIteratorWithIndex.h>
 
 #include "itkScalarImageToCooccurrenceMatrixFilter.h"
+#include "itkCoocurrenceMatrixNormalizerFilter.h"
 
 const unsigned int W = 200;
 const unsigned int H = 200;
@@ -67,18 +68,26 @@ int main(int argc, char **argv)
   offsetV->push_back(offset1);
   coocurrenceMatrixComputer->SetOffsets(offsetV);
 
+  const Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType* cooc = coocurrenceMatrixComputer->GetOutput();
+
+  itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::Pointer normalizerFilter = 
+    itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::New();
+
+  normalizerFilter->SetInput(coocurrenceMatrixComputer->GetOutput());
+
+  image->Modified();
   coocurrenceMatrixComputer->Update();
+  normalizerFilter->Update();
 
   for(int i = 0; i < 1000; ++i) 
   {
     image->Modified();
-    coocurrenceMatrixComputer->Update();
-    //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
-    //std::cout << "Requested Region:" << std::endl << image->GetRequestedRegion() << std::endl;
+    normalizerFilter->Update();
   }
-  const Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType* cooc = coocurrenceMatrixComputer->GetOutput();
 
-  typename Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::ConstIterator coocIt = cooc->Begin(), coocBegin = cooc->Begin(), coocEnd = cooc->End();
+  typedef typename itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::NormalizedCoocurrenceMatrixType NormalizedCoocurrenceMatrix;
+  typename NormalizedCoocurrenceMatrix::ConstPointer ncooc = normalizerFilter->GetOutput();
+  typename NormalizedCoocurrenceMatrix::ConstIterator coocIt = ncooc->Begin(), coocBegin = ncooc->Begin(), coocEnd = ncooc->End();
 
   while(coocIt != coocEnd)
   {

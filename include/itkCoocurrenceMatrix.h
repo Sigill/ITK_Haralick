@@ -30,20 +30,22 @@ public:
 
   typedef TCounterType CounterType;
   typedef std::vector<CounterType> CounterContainer;
+  typedef typename CounterContainer::iterator Iterator;
   typedef typename CounterContainer::const_iterator ConstIterator;
 
   CoocurrenceMatrix()
-    :CounterContainer()
+    :CounterContainer(), m_Size(0)
   {}
 
   itkNewMacro(Self);
 
-
   void SetSize(const unsigned int size)
   {
-    m_Size = size;
-    CounterContainer::resize(m_Size * m_Size);
-    SetToZero();
+    if(m_Size != size)
+      {
+      m_Size = size;
+      CounterContainer::resize(m_Size * m_Size);
+      }
   }
 
   inline unsigned int GetSize(void) const
@@ -51,9 +53,13 @@ public:
     return m_Size;
   }
 
-  inline unsigned int GetTotalCount(void) const
+  inline CounterType GetTotalCount(void) const
   {
     return m_TotalCount;
+  }
+  inline void SetTotalCount(CounterType v)
+  {
+    m_TotalCount = v;
   }
 
   inline void SetToZero()
@@ -68,19 +74,6 @@ public:
     ++m_TotalCount;
   }
 
-  /*
-  void Normalize() {
-    typename CounterContainer::iterator it = CounterContainer::begin(),
-             end = CounterContainer::end();
-    while(it < end)
-    {
-      *it /= m_TotalCount;
-      ++it;
-    }
-    m_TotalCount = 1;
-  }
-  */
-
   inline ConstIterator Begin(void) const
   {
     return CounterContainer::begin();
@@ -91,9 +84,19 @@ public:
     return CounterContainer::end();
   }
 
+  inline Iterator Begin(void)
+  {
+    return CounterContainer::begin();
+  }
+
+  inline Iterator End(void)
+  {
+    return CounterContainer::end();
+  }
+
 private:
   unsigned int m_Size;
-  unsigned int m_TotalCount;
+  CounterType m_TotalCount;
 
   inline unsigned int ComputeOffset(const unsigned int v1, const unsigned int v2) const
   {

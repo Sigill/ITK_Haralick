@@ -141,7 +141,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
     this->FillCoocurrenceMatrix();
     }
 
-  output->Modified();
 }
 
 template< class TImageType >

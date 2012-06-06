@@ -140,7 +140,6 @@ public:
   itkGetConstObjectMacro(Offsets, OffsetVector);
   void SetOffset(const OffsetType offset);
 
-  /** Set number of histogram bins along each axis */
   void SetNumberOfBinsPerAxis(const unsigned int n)
   {
     m_NumberOfBinsPerAxis = n;
