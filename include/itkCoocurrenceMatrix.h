@@ -14,8 +14,8 @@ namespace itk
 namespace Statistics
 {
 
-template< class TValueType = unsigned int, class TFrequencyType = float > 
-class CoocurrenceMatrix:private std::vector<TFrequencyType>, public DataObject
+template< class TCounterType = unsigned int > 
+class CoocurrenceMatrix:private std::vector<TCounterType>, public DataObject
 {
 public:
 
@@ -28,13 +28,12 @@ public:
   /** Run-time type information (and related methods) */
   itkTypeMacro(CoocurrenceMatrix, DataObject);
 
-  typedef TValueType ValueType;
-  typedef TFrequencyType FrequencyType;
-  typedef std::vector<FrequencyType> FrequencyContainer;
-  typedef typename FrequencyContainer::const_iterator ConstIterator;
+  typedef TCounterType CounterType;
+  typedef std::vector<CounterType> CounterContainer;
+  typedef typename CounterContainer::const_iterator ConstIterator;
 
   CoocurrenceMatrix()
-    :FrequencyContainer()
+    :CounterContainer()
   {}
 
   itkNewMacro(Self);
@@ -43,8 +42,8 @@ public:
   void SetSize(const unsigned int size)
   {
     m_Size = size;
-    FrequencyContainer::resize(m_Size * m_Size);
-    Reset();
+    CounterContainer::resize(m_Size * m_Size);
+    SetToZero();
   }
 
   inline unsigned int GetSize(void) const
@@ -52,44 +51,51 @@ public:
     return m_Size;
   }
 
-  inline void Reset()
+  inline unsigned int GetTotalCount(void) const
   {
-    std::fill( FrequencyContainer::begin(), FrequencyContainer::end(), NumericTraits< FrequencyType >::Zero );
-    m_TotalFrequency = 0;
+    return m_TotalCount;
   }
 
-  inline void IncrementFrequency(const ValueType v1, const ValueType v2)
+  inline void SetToZero()
   {
-    FrequencyContainer::operator[](ComputeOffset(v1, v2)) += 1;
-    ++m_TotalFrequency;
+    std::fill( CounterContainer::begin(), CounterContainer::end(), NumericTraits< CounterType >::Zero );
+    m_TotalCount = 0;
   }
 
+  inline void IncrementCounter(const unsigned int v1, const unsigned int v2)
+  {
+    CounterContainer::operator[](ComputeOffset(v1, v2)) += 1;
+    ++m_TotalCount;
+  }
+
+  /*
   void Normalize() {
-    typename FrequencyContainer::iterator it = FrequencyContainer::begin(),
-             end = FrequencyContainer::end();
+    typename CounterContainer::iterator it = CounterContainer::begin(),
+             end = CounterContainer::end();
     while(it < end)
     {
-      *it /= m_TotalFrequency;
+      *it /= m_TotalCount;
       ++it;
     }
-    m_TotalFrequency = 1;
+    m_TotalCount = 1;
   }
+  */
 
   inline ConstIterator Begin(void) const
   {
-    return FrequencyContainer::begin();
+    return CounterContainer::begin();
   }
 
   inline ConstIterator End(void) const
   {
-    return FrequencyContainer::end();
+    return CounterContainer::end();
   }
 
 private:
   unsigned int m_Size;
-  unsigned int m_TotalFrequency;
+  unsigned int m_TotalCount;
 
-  inline unsigned int ComputeOffset(const ValueType v1, const ValueType v2)
+  inline unsigned int ComputeOffset(const unsigned int v1, const unsigned int v2) const
   {
     return v2 * m_Size + v1;
   }

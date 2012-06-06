@@ -19,7 +19,7 @@ typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
 typedef typename OffsetVector::Pointer OffsetVectorPointer;
 
-typedef itk::Statistics::CoocurrenceMatrix< unsigned int, float > CoocurrenceMatrixType;
+typedef itk::Statistics::CoocurrenceMatrix< unsigned int > CoocurrenceMatrixType;
 
 int main(int argc, char **argv)
 {
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
-    coocurrenceMatrix->Reset();
+    coocurrenceMatrix->SetToZero();
 
     ConstIteratorWidx wit(image, windowRegion);
     wit.GoToBegin();
@@ -119,14 +119,12 @@ int main(int argc, char **argv)
         {
           offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
 
-          coocurrenceMatrix->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
-          coocurrenceMatrix->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          coocurrenceMatrix->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+          coocurrenceMatrix->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
         }
       }
       ++wit;
     }
-
-    coocurrenceMatrix->Normalize();
 
     /*
     typename CoocurrenceMatrixType::ConstIterator begin = coocurrenceMatrix.begin(), it = coocurrenceMatrix.begin(), end = coocurrenceMatrix.end();

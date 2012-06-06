@@ -38,7 +38,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::ScalarImageToCooccurrenceMa
   this->m_InsidePixelValue = NumericTraits< PixelType >::One;
 
   this->m_NumberOfBinsPerAxis = DefaultBinsPerAxis;
-  this->m_Normalize = false;
 }
 
 template< class TImageType >
@@ -115,7 +114,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   CoocurrenceMatrixType *output =
     static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
-  output->Reset();
+  output->SetToZero();
 
   const ImageType *input = this->GetInput();
 
@@ -142,11 +141,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
     this->FillCoocurrenceMatrix();
     }
 
-  // Normalizse the histogram if requested
-  if ( m_Normalize )
-    {
-    this->NormalizeCoocurrenceMatrix();
-    }
+  output->Modified();
 }
 
 template< class TImageType >
@@ -191,8 +186,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(void)
                       // is out-of-bounds.
             }
 
-          output->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
-          output->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+          output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
           }
       }
     ++iterator;
@@ -250,22 +245,12 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMa
                       // is out-of-bounds.
             }
 
-          output->IncrementFrequency(centerPixelIntensity, offsetPixelIntensity);
-          output->IncrementFrequency(offsetPixelIntensity, centerPixelIntensity);
+          output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+          output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
           }
       }
     ++iterator;
   }
-}
-
-template< class TImageType >
-void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::NormalizeCoocurrenceMatrix(void)
-{
-  CoocurrenceMatrixType *output =
-    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
-
-  output->Normalize();
 }
 
 template< class TImageType >
@@ -298,7 +283,6 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::PrintSelf(std::ostream & os
   Superclass::PrintSelf(os, indent);
   os << indent << "Offsets: " << this->GetOffsets() << std::endl;
   os << indent << "NumberOfBinsPerAxis: " << this->GetNumberOfBinsPerAxis() << std::endl;
-  os << indent << "Normalize: " << this->GetNormalize() << std::endl;
   os << indent << "InsidePixelValue: " << this->GetInsidePixelValue() << std::endl;
 }
 } // end of namespace Statistics

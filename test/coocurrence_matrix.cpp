@@ -1,6 +1,6 @@
 #include <itkCoocurrenceMatrix.h>
 
-typedef itk::Statistics::CoocurrenceMatrix< unsigned int, float > CoocurrenceMatrixType;
+typedef itk::Statistics::CoocurrenceMatrix< unsigned int > CoocurrenceMatrixType;
 
 int main(void) {
   CoocurrenceMatrixType matrix;

@@ -118,7 +118,7 @@ public:
 
   typedef typename NumericTraits< PixelType >::RealType MeasurementType;
 
-  typedef CoocurrenceMatrix< PixelType, float> CoocurrenceMatrixType;
+  typedef CoocurrenceMatrix< unsigned int > CoocurrenceMatrixType;
   typedef typename CoocurrenceMatrixType::Pointer                            CoocurrenceMatrixPointer;
   typedef typename CoocurrenceMatrixType::ConstPointer                       CoocurrenceMatrixConstPointer;
 
@@ -153,12 +153,6 @@ public:
 
   itkSetMacro(RegionOfInterest, RegionType);
   itkGetConstMacro(RegionOfInterest, RegionType);
-
-  /** Set the calculator to normalize the histogram (divide all bins by the
-    total frequency). Normalization is off by default. */
-  itkSetMacro(Normalize, bool);
-  itkGetConstMacro(Normalize, bool);
-  itkBooleanMacro(Normalize);
 
   /** Method to set/get the image */
   using Superclass::SetInput;
@@ -205,8 +199,6 @@ private:
 
   // implemented
 
-  void NormalizeCoocurrenceMatrix(void);
-
   void ComputeOffsetsMinRadius(void);
 
   OffsetVectorConstPointer m_Offsets;
@@ -215,7 +207,6 @@ private:
   RegionType m_RegionOfInterest;
 
   unsigned int          m_NumberOfBinsPerAxis;
-  bool                  m_Normalize;
 
   PixelType m_InsidePixelValue;
 };
