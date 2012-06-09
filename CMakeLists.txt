@@ -30,3 +30,11 @@ if( "${ITK_VERSION_MAJOR}" LESS 4 )
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(filters ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
+
+add_executable(image_to_features test/image_to_features.cpp)
+ 
+if( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(image_to_features ITKReview ${ITK_LIBRARIES})
+else( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(image_to_features ${ITK_LIBRARIES})
+endif( "${ITK_VERSION_MAJOR}" LESS 4 )
