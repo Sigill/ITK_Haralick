@@ -1,5 +1,5 @@
-#ifndef __itkCoocurrenceMatrix_h
-#define __itkCoocurrenceMatrix_h
+#ifndef __itkCooccurrenceMatrix_h
+#define __itkCooccurrenceMatrix_h
 
 #include <vector>
 
@@ -15,18 +15,18 @@ namespace Statistics
 {
 
 template< class TMeasurementType = unsigned int > 
-class CoocurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
+class CooccurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
 {
 public:
 
   /** Standard class typedefs */
-  typedef CoocurrenceMatrix          Self;
+  typedef CooccurrenceMatrix          Self;
   typedef DataObject                 Superclass;
   typedef SmartPointer< Self >       Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
   /** Run-time type information (and related methods) */
-  itkTypeMacro(CoocurrenceMatrix, DataObject);
+  itkTypeMacro(CooccurrenceMatrix, DataObject);
 
   typedef TMeasurementType MeasurementType;
   typedef std::vector<MeasurementType> CounterContainer;
@@ -35,7 +35,7 @@ public:
   typedef typename CounterContainer::iterator Iterator;
   typedef typename CounterContainer::const_iterator ConstIterator;
 
-  CoocurrenceMatrix()
+  CooccurrenceMatrix()
     :CounterContainer(), m_Size(0)
   {}
 
@@ -117,8 +117,8 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkCoocurrenceMatrix.hxx"
+#include "itkCooccurrenceMatrix.hxx"
 #endif
 
-#endif /* __itkCoocurrenceMatrix_h */
+#endif /* __itkCooccurrenceMatrix_h */
 

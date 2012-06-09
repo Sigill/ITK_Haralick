@@ -19,7 +19,7 @@
 #define __itkScalarImageToCooccurrenceMatrixFilter_h
 
 #include "itkImage.h"
-#include "itkCoocurrenceMatrix.h"
+#include "itkCooccurrenceMatrix.h"
 #include "itkVectorContainer.h"
 #include "itkNumericTraits.h"
 
@@ -29,7 +29,7 @@ namespace Statistics
 {
 /** \class ScalarImageToCooccurrenceMatrixFilter
  *  \brief This class computes a co-occurence matrix (histogram) from
- * a given image and a mask image if provided. Coocurrence matrces are
+ * a given image and a mask image if provided. Cooccurrence matrces are
  * used for image texture description.
  *
  * This filters creates a grey-level co-occurence matrix from a N-D scalar
@@ -118,9 +118,9 @@ public:
 
   typedef typename NumericTraits< PixelType >::RealType MeasurementType;
 
-  typedef CoocurrenceMatrix< unsigned int > CoocurrenceMatrixType;
-  typedef typename CoocurrenceMatrixType::Pointer                            CoocurrenceMatrixPointer;
-  typedef typename CoocurrenceMatrixType::ConstPointer                       CoocurrenceMatrixConstPointer;
+  typedef CooccurrenceMatrix< unsigned int > CooccurrenceMatrixType;
+  typedef typename CooccurrenceMatrixType::Pointer                            CooccurrenceMatrixPointer;
+  typedef typename CooccurrenceMatrixType::ConstPointer                       CooccurrenceMatrixConstPointer;
 
   itkStaticConstMacro(DefaultBinsPerAxis, unsigned int, 256);
 
@@ -143,8 +143,8 @@ public:
   void SetNumberOfBinsPerAxis(const unsigned int n)
   {
     m_NumberOfBinsPerAxis = n;
-    CoocurrenceMatrixType *output =
-      static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+    CooccurrenceMatrixType *output =
+      static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
     output->SetSize(m_NumberOfBinsPerAxis);
   }
@@ -164,8 +164,8 @@ public:
 
   const ImageType * GetMaskImage() const;
 
-  /** method to get the CoocurrenceMatrix */
-  const CoocurrenceMatrixType * GetOutput() const;
+  /** method to get the CooccurrenceMatrix */
+  const CooccurrenceMatrixType * GetOutput() const;
 
   /** Set the pixel value of the mask that should be considered "inside" the
     object. Defaults to one. */
@@ -177,9 +177,9 @@ protected:
   virtual ~ScalarImageToCooccurrenceMatrixFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-  virtual void FillCoocurrenceMatrix(void);
+  virtual void FillCooccurrenceMatrix(void);
 
-  virtual void FillCoocurrenceMatrixWithMask(const ImageType *maskImage);
+  virtual void FillCooccurrenceMatrixWithMask(const ImageType *maskImage);
 
   /** Standard itk::ProcessObject subclass method. */
   typedef DataObject::Pointer DataObjectPointer;

@@ -15,10 +15,10 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_hxx
-#define __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_hxx
+#ifndef __itkCooccurrenceMatrixToHaralickTextureFeaturesFilter_hxx
+#define __itkCooccurrenceMatrixToHaralickTextureFeaturesFilter_hxx
 
-#include "itkCoocurrenceMatrixToHaralickTextureFeaturesFilter.h"
+#include "itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
 
 #include "itkNumericTraits.h"
 #include "vnl/vnl_math.h"
@@ -28,8 +28,8 @@ namespace itk
 namespace Statistics
 {
 //constructor
-template< class TCoocurrenceMatrix >
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::CoocurrenceMatrixToHaralickTextureFeaturesFilter(void)
+template< class TCooccurrenceMatrix >
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::CooccurrenceMatrixToHaralickTextureFeaturesFilter(void)
 {
   this->ProcessObject::SetNumberOfRequiredInputs(1);
 
@@ -41,42 +41,42 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::Coocurre
     }
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 void
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
-::SetInput(const CoocurrenceMatrixType *coocurrenceMatrix)
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
+::SetInput(const CooccurrenceMatrixType *cooccurrenceMatrix)
 {
-  this->ProcessObject::SetNthInput( 0, const_cast< CoocurrenceMatrixType * >( coocurrenceMatrix ) );
+  this->ProcessObject::SetNthInput( 0, const_cast< CooccurrenceMatrixType * >( cooccurrenceMatrix ) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const typename
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::CoocurrenceMatrixType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::CooccurrenceMatrixType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetInput() const
 {
-  return static_cast< const CoocurrenceMatrixType * >( this->GetPrimaryInput() );
+  return static_cast< const CooccurrenceMatrixType * >( this->GetPrimaryInput() );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 typename
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::DataObjectPointer
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::DataObjectPointer
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::MakeOutput( DataObjectPointerArraySizeType itkNotUsed(idx) )
 {
   return static_cast< DataObject * >( MeasurementObjectType::New().GetPointer() );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 void
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::GenerateData(void)
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::GenerateData(void)
 {
-  typedef typename CoocurrenceMatrixType::ConstIterator CoocurrenceMatrixIterator;
+  typedef typename CooccurrenceMatrixType::ConstIterator CooccurrenceMatrixIterator;
 
-  const CoocurrenceMatrixType *inputCoocurrenceMatrix = this->GetInput();
+  const CooccurrenceMatrixType *inputCooccurrenceMatrix = this->GetInput();
 
   // Now get the various means and variances. This is takes two passes
-  // through the coocurrenceMatrix.
+  // through the cooccurrenceMatrix.
   double pixelMean;
   double marginalMean;
   double marginalDevSquared;
@@ -100,15 +100,15 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::Generate
 
   double log2 = vcl_log(2.0);
 
-  CoocurrenceMatrixIterator cooc_begin = inputCoocurrenceMatrix->Begin(), cooc_end = inputCoocurrenceMatrix->End();
-  CoocurrenceMatrixIterator cooc_it = cooc_begin;
+  CooccurrenceMatrixIterator cooc_begin = inputCooccurrenceMatrix->Begin(), cooc_end = inputCooccurrenceMatrix->End();
+  CooccurrenceMatrixIterator cooc_it = cooc_begin;
   IndexType i1, i2;
   while ( cooc_it != cooc_end )
     {
     MeasurementType frequency = *cooc_it;
     if ( frequency != 0 )
       {
-      inputCoocurrenceMatrix->GetIndexes( cooc_it - cooc_begin, &i1, &i2 );
+      inputCooccurrenceMatrix->GetIndexes( cooc_it - cooc_begin, &i1, &i2 );
 
       energy += frequency * frequency;
       entropy -= ( frequency > 0.0001 ) ? frequency *vcl_log(frequency) / log2:0;
@@ -163,28 +163,28 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::Generate
   haralickCorrelationOutputObject->Set(haralickCorrelation);
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 void
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::ComputeMeansAndVariances(double & pixelMean,
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::ComputeMeansAndVariances(double & pixelMean,
                                                                                                  double & marginalMean,
                                                                                                  double & marginalDevSquared,
                                                                                                  double & pixelDevSquared)
 {
-  // This function takes two passes through the coocurrenceMatrix and two passes through
-  // an array of the same length as a coocurrenceMatrix axis. This could probably be
+  // This function takes two passes through the cooccurrenceMatrix and two passes through
+  // an array of the same length as a cooccurrenceMatrix axis. This could probably be
   // cleverly compressed to one pass, but it's not clear that that's necessary.
 
-  typedef typename CoocurrenceMatrixType::ConstIterator CoocurrenceMatrixIterator;
+  typedef typename CooccurrenceMatrixType::ConstIterator CooccurrenceMatrixIterator;
 
-  const CoocurrenceMatrixType *inputCoocurrenceMatrix =  this->GetInput();
+  const CooccurrenceMatrixType *inputCooccurrenceMatrix =  this->GetInput();
 
   // Initialize everything
-  typename CoocurrenceMatrixType::SizeType matrixSize = inputCoocurrenceMatrix->GetSize();
+  typename CooccurrenceMatrixType::SizeType matrixSize = inputCooccurrenceMatrix->GetSize();
   double *marginalSums = new double[matrixSize];
   std::fill(marginalSums, marginalSums + matrixSize, 0.0);
 
-  CoocurrenceMatrixIterator cooc_begin = inputCoocurrenceMatrix->Begin(), cooc_end = inputCoocurrenceMatrix->End();
-  CoocurrenceMatrixIterator cooc_it = cooc_begin;
+  CooccurrenceMatrixIterator cooc_begin = inputCooccurrenceMatrix->Begin(), cooc_end = inputCooccurrenceMatrix->End();
+  CooccurrenceMatrixIterator cooc_it = cooc_begin;
   IndexType i1, i2;
 
   /*  Now get the mean and deviaton of the marginal sums.
@@ -213,7 +213,7 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::ComputeM
     W_k = *cooc_it;
     if(W_k > 0)
       {
-      inputCoocurrenceMatrix->GetIndexes( cooc_it - cooc_begin, &i1, &i2 );
+      inputCooccurrenceMatrix->GetIndexes( cooc_it - cooc_begin, &i1, &i2 );
 
       SW_k += W_k;
 
@@ -252,145 +252,145 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::ComputeM
   delete[] marginalSums;
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetEnergyOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(0) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetEntropyOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(1) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetCorrelationOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(2) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetInverseDifferenceMomentOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(3) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetInertiaOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(4) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetClusterShadeOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(5) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetClusterProminenceOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(6) );
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 const
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementObjectType *
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementObjectType *
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetHaralickCorrelationOutput() const
 {
   return static_cast< const MeasurementObjectType * >( this->ProcessObject::GetOutput(7) );
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetEnergy() const
 {
   return this->GetEnergyOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetEntropy() const
 {
   return this->GetEntropyOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetCorrelation() const
 {
   return this->GetCorrelationOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetInverseDifferenceMoment() const
 {
   return this->GetInverseDifferenceMomentOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetInertia() const
 {
   return this->GetInertiaOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetClusterShade() const
 {
   return this->GetClusterShadeOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetClusterProminence() const
 {
   return this->GetClusterProminenceOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetHaralickCorrelation() const
 {
   return this->GetHaralickCorrelationOutput()->Get();
 }
 
-template< class TCoocurrenceMatrix >
-typename CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >::MeasurementType
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
+typename CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::MeasurementType
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::GetFeature(TextureFeatureName feature)
 {
   switch ( feature )
@@ -416,9 +416,9 @@ CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
     }
 }
 
-template< class TCoocurrenceMatrix >
+template< class TCooccurrenceMatrix >
 void
-CoocurrenceMatrixToHaralickTextureFeaturesFilter< TCoocurrenceMatrix >
+CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);

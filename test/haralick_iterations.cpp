@@ -2,7 +2,7 @@
 #include <itkVectorContainer.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkConstNeighborhoodIterator.h>
-#include "itkCoocurrenceMatrix.h"
+#include "itkCooccurrenceMatrix.h"
 
 const unsigned int W = 16;
 const unsigned int H = 16;
@@ -19,7 +19,7 @@ typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
 typedef typename OffsetVector::Pointer OffsetVectorPointer;
 
-typedef itk::Statistics::CoocurrenceMatrix< unsigned int > CoocurrenceMatrixType;
+typedef itk::Statistics::CooccurrenceMatrix< unsigned int > CooccurrenceMatrixType;
 
 int main(int argc, char **argv)
 {
@@ -82,8 +82,8 @@ int main(int argc, char **argv)
 
   std::cout << "Window size: " << windowSize << std::endl;
 
-  typename CoocurrenceMatrixType::Pointer coocurrenceMatrix = CoocurrenceMatrixType::New();
-  coocurrenceMatrix->SetSize(16);
+  typename CooccurrenceMatrixType::Pointer cooccurrenceMatrix = CooccurrenceMatrixType::New();
+  cooccurrenceMatrix->SetSize(16);
 
   ImageType::IndexType pixelIndex;
 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
-    coocurrenceMatrix->SetToZero();
+    cooccurrenceMatrix->SetToZero();
 
     ConstIteratorWidx wit(image, windowRegion);
     wit.GoToBegin();
@@ -119,15 +119,15 @@ int main(int argc, char **argv)
         {
           offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
 
-          coocurrenceMatrix->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
-          coocurrenceMatrix->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
+          cooccurrenceMatrix->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+          cooccurrenceMatrix->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
         }
       }
       ++wit;
     }
 
     /*
-    typename CoocurrenceMatrixType::ConstIterator begin = coocurrenceMatrix.begin(), it = coocurrenceMatrix.begin(), end = coocurrenceMatrix.end();
+    typename CooccurrenceMatrixType::ConstIterator begin = cooccurrenceMatrix.begin(), it = cooccurrenceMatrix.begin(), end = cooccurrenceMatrix.end();
     while(it < end)
     {
       std::cout << (it - begin) << " -> " << *it << std::endl;

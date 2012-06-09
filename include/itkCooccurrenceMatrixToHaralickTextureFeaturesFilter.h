@@ -15,10 +15,10 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_h
-#define __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_h
+#ifndef __itkCooccurrenceMatrixToHaralickTextureFeaturesFilter_h
+#define __itkCooccurrenceMatrixToHaralickTextureFeaturesFilter_h
 
-#include "itkCoocurrenceMatrix.h"
+#include "itkCooccurrenceMatrix.h"
 #include "itkMacro.h"
 #include "itkProcessObject.h"
 #include "itkSimpleDataObjectDecorator.h"
@@ -27,7 +27,7 @@ namespace itk
 {
 namespace Statistics
 {
-/** \class CoocurrenceMatrixToHaralickTextureFeaturesFilter
+/** \class CooccurrenceMatrixToHaralickTextureFeaturesFilter
 *  \brief This class computes texture feature coefficients from a grey level
 * co-occurrence matrix.
 *
@@ -66,9 +66,9 @@ namespace Statistics
 * features 1, 2, 4, 5, 6, and 7. There is some correlation between the various
 * features, so using all of them at the same time is not necessarialy a good idea.
 *
-* NOTA BENE: The input coocurrenceMatrix will be forcably normalized!
+* NOTA BENE: The input cooccurrenceMatrix will be forcably normalized!
 * This algorithm takes three passes through the input
-* coocurrenceMatrix if the coocurrenceMatrix was already normalized, and four if not.
+* cooccurrenceMatrix if the cooccurrenceMatrix was already normalized, and four if not.
 *
 * Web references:
 *
@@ -99,33 +99,33 @@ namespace Statistics
 * \ingroup ITKStatistics
 */
 
-template< class TCoocurrenceMatrix >
-class ITK_EXPORT CoocurrenceMatrixToHaralickTextureFeaturesFilter:public ProcessObject
+template< class TCooccurrenceMatrix >
+class ITK_EXPORT CooccurrenceMatrixToHaralickTextureFeaturesFilter:public ProcessObject
 {
 public:
   /** Standard typedefs */
-  typedef CoocurrenceMatrixToHaralickTextureFeaturesFilter Self;
+  typedef CooccurrenceMatrixToHaralickTextureFeaturesFilter Self;
   typedef ProcessObject                    Superclass;
   typedef SmartPointer< Self >             Pointer;
   typedef SmartPointer< const Self >       ConstPointer;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(CoocurrenceMatrixToHaralickTextureFeaturesFilter, ProcessObject);
+  itkTypeMacro(CooccurrenceMatrixToHaralickTextureFeaturesFilter, ProcessObject);
 
   /** standard New() method support */
   itkNewMacro(Self);
 
-  typedef TCoocurrenceMatrix                                    CoocurrenceMatrixType;
-  typedef typename CoocurrenceMatrixType::Pointer               CoocurrenceMatrixPointer;
-  typedef typename CoocurrenceMatrixType::ConstPointer          CoocurrenceMatrixConstPointer;
-  typedef typename CoocurrenceMatrixType::MeasurementType       MeasurementType;
-  typedef typename CoocurrenceMatrixType::IndexType             IndexType;
+  typedef TCooccurrenceMatrix                                    CooccurrenceMatrixType;
+  typedef typename CooccurrenceMatrixType::Pointer               CooccurrenceMatrixPointer;
+  typedef typename CooccurrenceMatrixType::ConstPointer          CooccurrenceMatrixConstPointer;
+  typedef typename CooccurrenceMatrixType::MeasurementType       MeasurementType;
+  typedef typename CooccurrenceMatrixType::IndexType             IndexType;
 
-  /** Method to Set/Get the input CoocurrenceMatrix */
+  /** Method to Set/Get the input CooccurrenceMatrix */
   using Superclass::SetInput;
-  void SetInput(const CoocurrenceMatrixType *coocurrenceMatrix);
+  void SetInput(const CooccurrenceMatrixType *cooccurrenceMatrix);
 
-  const CoocurrenceMatrixType * GetInput() const;
+  const CooccurrenceMatrixType * GetInput() const;
 
   /** Smart Pointer type to a DataObject. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -190,8 +190,8 @@ public:
   MeasurementType GetFeature(TextureFeatureName name);
 
 protected:
-  CoocurrenceMatrixToHaralickTextureFeaturesFilter();
-  ~CoocurrenceMatrixToHaralickTextureFeaturesFilter() {}
+  CooccurrenceMatrixToHaralickTextureFeaturesFilter();
+  ~CooccurrenceMatrixToHaralickTextureFeaturesFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
   /** Make a DataObject to be used for output output. */
@@ -202,7 +202,7 @@ protected:
   void GenerateData();
 
 private:
-  CoocurrenceMatrixToHaralickTextureFeaturesFilter(const Self &); //purposely not implemented
+  CooccurrenceMatrixToHaralickTextureFeaturesFilter(const Self &); //purposely not implemented
   void operator=(const Self &);                   //purposely not implemented
 
   void ComputeMeansAndVariances(double & pixelMean, double & marginalMean,
@@ -213,7 +213,7 @@ private:
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkCoocurrenceMatrixToHaralickTextureFeaturesFilter.hxx"
+#include "itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.hxx"
 #endif
 
 #endif

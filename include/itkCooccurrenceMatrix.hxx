@@ -1,7 +1,7 @@
-#ifndef __itkCoocurrenceMatrix_hxx
-#define __itkCoocurrenceMatrix_hxx
+#ifndef __itkCooccurrenceMatrix_hxx
+#define __itkCooccurrenceMatrix_hxx
 
-#include "itkCoocurrenceMatrix.h"
+#include "itkCooccurrenceMatrix.h"
 
 namespace itk
 {
@@ -11,7 +11,7 @@ namespace Statistics
 /*
 template< class TValueType, class TFrequencyType >
 void
-CoocurrenceMatrix< TValueType, TFrequencyType >
+CooccurrenceMatrix< TValueType, TFrequencyType >
 ::Initialize(const unsigned int size)
 {
 }
@@ -20,5 +20,5 @@ CoocurrenceMatrix< TValueType, TFrequencyType >
 } // End namespace Statistics
 } // End namespace itk
 
-#endif /* __itkCoocurrenceMatrix_hxx */
+#endif /* __itkCooccurrenceMatrix_hxx */
 

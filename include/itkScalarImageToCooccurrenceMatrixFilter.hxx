@@ -88,12 +88,12 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >
 }
 
 template< class TImageType >
-const typename ScalarImageToCooccurrenceMatrixFilter< TImageType >::CoocurrenceMatrixType *
+const typename ScalarImageToCooccurrenceMatrixFilter< TImageType >::CooccurrenceMatrixType *
 ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::GetOutput() const
 {
-  const CoocurrenceMatrixType *output =
-    static_cast< const CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+  const CooccurrenceMatrixType *output =
+    static_cast< const CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   return output;
 }
@@ -103,7 +103,7 @@ typename ScalarImageToCooccurrenceMatrixFilter< TImageType >::DataObjectPointer
 ScalarImageToCooccurrenceMatrixFilter< TImageType >
 ::MakeOutput( DataObjectPointerArraySizeType itkNotUsed(idx) )
 {
-  typename CoocurrenceMatrixType::Pointer output = CoocurrenceMatrixType::New();
+  typename CooccurrenceMatrixType::Pointer output = CooccurrenceMatrixType::New();
   return static_cast< DataObject * >( output.GetPointer() );
 }
 
@@ -111,8 +111,8 @@ template< class TImageType >
 void
 ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
 {
-  CoocurrenceMatrixType *output =
-    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+  CooccurrenceMatrixType *output =
+    static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   output->SetToZero();
 
@@ -134,26 +134,26 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
   // Now fill in the histogram
   if ( maskImage != NULL )
     {
-    this->FillCoocurrenceMatrixWithMask(maskImage);
+    this->FillCooccurrenceMatrixWithMask(maskImage);
     }
   else
     {
-    this->FillCoocurrenceMatrix();
+    this->FillCooccurrenceMatrix();
     }
 
 }
 
 template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(void)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCooccurrenceMatrix(void)
 {
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
 
   const ImageType *input = this->GetInput();
 
-  CoocurrenceMatrixType *output =
-    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+  CooccurrenceMatrixType *output =
+    static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(input, m_RegionOfInterest);
   PixelType centerPixelIntensity, offsetPixelIntensity;
@@ -195,15 +195,15 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrix(void)
 
 template< class TImageType >
 void
-ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCoocurrenceMatrixWithMask(const ImageType *maskImage)
+ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCooccurrenceMatrixWithMask(const ImageType *maskImage)
 {
   // Iterate over all of those pixels and offsets, adding each
   // co-occurrence pair to the histogram
 
   const ImageType *input = this->GetInput();
 
-  CoocurrenceMatrixType *output =
-    static_cast< CoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+  CooccurrenceMatrixType *output =
+    static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
   itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(input, m_RegionOfInterest);
   PixelType centerPixelIntensity, offsetPixelIntensity;

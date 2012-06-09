@@ -3,8 +3,8 @@
 #include <itkImageRegionIteratorWithIndex.h>
 
 #include "itkScalarImageToCooccurrenceMatrixFilter.h"
-#include "itkCoocurrenceMatrixNormalizerFilter.h"
-#include "itkCoocurrenceMatrixToHaralickTextureFeaturesFilter.h"
+#include "itkCooccurrenceMatrixNormalizerFilter.h"
+#include "itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
 
 const unsigned int W = 200;
 const unsigned int H = 200;
@@ -12,7 +12,7 @@ const unsigned int D = 2;
 
 typedef itk::Image<unsigned char, D> Image2DType;
 typedef itk::ImageRegionIteratorWithIndex< Image2DType > Image2DIterator;
-typedef itk::Statistics::ScalarImageToCooccurrenceMatrixFilter< Image2DType > Image2DCoocurrenceMatrixComputer;
+typedef itk::Statistics::ScalarImageToCooccurrenceMatrixFilter< Image2DType > Image2DCooccurrenceMatrixComputer;
 
 int main(int argc, char **argv)
 {
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   }
 
 
-  Image2DCoocurrenceMatrixComputer::Pointer coocurrenceMatrixComputer = Image2DCoocurrenceMatrixComputer::New();
+  Image2DCooccurrenceMatrixComputer::Pointer cooccurrenceMatrixComputer = Image2DCooccurrenceMatrixComputer::New();
 
   Image2DType::RegionType roi;
   Image2DType::IndexType rIndex = {{ 0, 0 }};
@@ -64,30 +64,30 @@ int main(int argc, char **argv)
   roi.SetSize( rSize );
   roi.SetIndex( rIndex );
 
-  coocurrenceMatrixComputer->SetNumberOfBinsPerAxis(4); //reasonable number of bins
+  cooccurrenceMatrixComputer->SetNumberOfBinsPerAxis(4); //reasonable number of bins
 
-  coocurrenceMatrixComputer->SetRegionOfInterest(roi);
+  cooccurrenceMatrixComputer->SetRegionOfInterest(roi);
 
-  coocurrenceMatrixComputer->SetInput(image);
+  cooccurrenceMatrixComputer->SetInput(image);
 
   Image2DType::OffsetType offset1 = {{0, 1}};
-  Image2DCoocurrenceMatrixComputer::OffsetVectorPointer offsetV = Image2DCoocurrenceMatrixComputer::OffsetVector::New();
+  Image2DCooccurrenceMatrixComputer::OffsetVectorPointer offsetV = Image2DCooccurrenceMatrixComputer::OffsetVector::New();
   offsetV->push_back(offset1);
-  coocurrenceMatrixComputer->SetOffsets(offsetV);
+  cooccurrenceMatrixComputer->SetOffsets(offsetV);
 
-  const Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType* cooc = coocurrenceMatrixComputer->GetOutput();
+  const Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType* cooc = cooccurrenceMatrixComputer->GetOutput();
 
-  itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::Pointer normalizerFilter = 
-    itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::New();
+  itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::Pointer normalizerFilter = 
+    itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::New();
 
-  normalizerFilter->SetInput(coocurrenceMatrixComputer->GetOutput());
+  normalizerFilter->SetInput(cooccurrenceMatrixComputer->GetOutput());
 
   image->Modified();
-  coocurrenceMatrixComputer->Update();
+  cooccurrenceMatrixComputer->Update();
   normalizerFilter->Update();
 
-  typedef typename itk::Statistics::CoocurrenceMatrixNormalizerFilter< Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType, float >::NormalizedCoocurrenceMatrixType NormalizedCoocurrenceMatrix;
-  typedef typename itk::Statistics::CoocurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedCoocurrenceMatrix > HaralickFeaturesComputer;
+  typedef typename itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::NormalizedCooccurrenceMatrixType NormalizedCooccurrenceMatrix;
+  typedef typename itk::Statistics::CooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedCooccurrenceMatrix > HaralickFeaturesComputer;
   HaralickFeaturesComputer::Pointer haralickFeaturesComputer = HaralickFeaturesComputer::New();
   haralickFeaturesComputer->SetInput(normalizerFilter->GetOutput());
 
@@ -98,8 +98,8 @@ int main(int argc, char **argv)
     haralickFeaturesComputer->Update();
   }
 
-  typename NormalizedCoocurrenceMatrix::ConstPointer ncooc = normalizerFilter->GetOutput();
-  typename NormalizedCoocurrenceMatrix::ConstIterator coocIt = ncooc->Begin(), coocBegin = ncooc->Begin(), coocEnd = ncooc->End();
+  typename NormalizedCooccurrenceMatrix::ConstPointer ncooc = normalizerFilter->GetOutput();
+  typename NormalizedCooccurrenceMatrix::ConstIterator coocIt = ncooc->Begin(), coocBegin = ncooc->Begin(), coocEnd = ncooc->End();
 
   unsigned int i1, i2;
   while(coocIt != coocEnd)
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     std::cout << "(" << i1 << "; " << i2 << ")" << " -> " << (*coocIt) << std::endl;
     ++coocIt;
   }
-  std::cout << "Total Frequency : " << coocurrenceMatrixComputer->GetOutput()->GetTotalCount() << std::endl;
+  std::cout << "Total Frequency : " << cooccurrenceMatrixComputer->GetOutput()->GetTotalCount() << std::endl;
 
 
   std::cout << "Energy: " << haralickFeaturesComputer->GetEnergy() << std::endl;
@@ -122,10 +122,10 @@ int main(int argc, char **argv)
   std::cout << "HaralickCorrelation: " << haralickFeaturesComputer->GetHaralickCorrelation() << std::endl;
 
   /*
-  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType one_one( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType one_two( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType two_one( hist->GetMeasurementVectorSize() );
-  Image2DCoocurrenceMatrixComputer::CoocurrenceMatrixType::IndexType two_two( hist->GetMeasurementVectorSize() );
+  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType one_one( hist->GetMeasurementVectorSize() );
+  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType one_two( hist->GetMeasurementVectorSize() );
+  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType two_one( hist->GetMeasurementVectorSize() );
+  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType two_two( hist->GetMeasurementVectorSize() );
 
   one_one[0] = 1;
   one_one[1] = 1;
