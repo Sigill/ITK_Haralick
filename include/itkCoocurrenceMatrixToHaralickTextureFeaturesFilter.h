@@ -15,10 +15,10 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkHistogramToTextureFeaturesFilter_h
-#define __itkHistogramToTextureFeaturesFilter_h
+#ifndef __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_h
+#define __itkCoocurrenceMatrixToHaralickTextureFeaturesFilter_h
 
-#include "itkHistogram.h"
+#include "itkCoocurrenceMatrix.h"
 #include "itkMacro.h"
 #include "itkProcessObject.h"
 #include "itkSimpleDataObjectDecorator.h"
@@ -27,7 +27,7 @@ namespace itk
 {
 namespace Statistics
 {
-/** \class HistogramToTextureFeaturesFilter
+/** \class CoocurrenceMatrixToHaralickTextureFeaturesFilter
 *  \brief This class computes texture feature coefficients from a grey level
 * co-occurrence matrix.
 *
@@ -66,9 +66,9 @@ namespace Statistics
 * features 1, 2, 4, 5, 6, and 7. There is some correlation between the various
 * features, so using all of them at the same time is not necessarialy a good idea.
 *
-* NOTA BENE: The input histogram will be forcably normalized!
+* NOTA BENE: The input coocurrenceMatrix will be forcably normalized!
 * This algorithm takes three passes through the input
-* histogram if the histogram was already normalized, and four if not.
+* coocurrenceMatrix if the coocurrenceMatrix was already normalized, and four if not.
 *
 * Web references:
 *
@@ -99,45 +99,33 @@ namespace Statistics
 * \ingroup ITKStatistics
 */
 
-template< class THistogram >
-class ITK_EXPORT HistogramToTextureFeaturesFilter:public ProcessObject
+template< class TCoocurrenceMatrix >
+class ITK_EXPORT CoocurrenceMatrixToHaralickTextureFeaturesFilter:public ProcessObject
 {
 public:
   /** Standard typedefs */
-  typedef HistogramToTextureFeaturesFilter Self;
+  typedef CoocurrenceMatrixToHaralickTextureFeaturesFilter Self;
   typedef ProcessObject                    Superclass;
   typedef SmartPointer< Self >             Pointer;
   typedef SmartPointer< const Self >       ConstPointer;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(HistogramToTextureFeaturesFilter, ProcessObject);
+  itkTypeMacro(CoocurrenceMatrixToHaralickTextureFeaturesFilter, ProcessObject);
 
   /** standard New() method support */
   itkNewMacro(Self);
 
-  typedef THistogram                                    HistogramType;
-  typedef typename HistogramType::Pointer               HistogramPointer;
-  typedef typename HistogramType::ConstPointer          HistogramConstPointer;
-  typedef typename HistogramType::MeasurementType       MeasurementType;
-  typedef typename HistogramType::MeasurementVectorType MeasurementVectorType;
-  typedef typename HistogramType::IndexType             IndexType;
-  typedef typename HistogramType::AbsoluteFrequencyType AbsoluteFrequencyType;
-  typedef typename HistogramType::RelativeFrequencyType RelativeFrequencyType;
+  typedef TCoocurrenceMatrix                                    CoocurrenceMatrixType;
+  typedef typename CoocurrenceMatrixType::Pointer               CoocurrenceMatrixPointer;
+  typedef typename CoocurrenceMatrixType::ConstPointer          CoocurrenceMatrixConstPointer;
+  typedef typename CoocurrenceMatrixType::MeasurementType       MeasurementType;
+  typedef typename CoocurrenceMatrixType::IndexType             IndexType;
 
-  typedef typename HistogramType::TotalAbsoluteFrequencyType
-  TotalAbsoluteFrequencyType;
-
-  typedef typename HistogramType::TotalRelativeFrequencyType
-  TotalRelativeFrequencyType;
-
-  /** Container to hold relative frequencies of the histogram */
-  typedef std::vector< RelativeFrequencyType > RelativeFrequencyContainerType;
-
-  /** Method to Set/Get the input Histogram */
+  /** Method to Set/Get the input CoocurrenceMatrix */
   using Superclass::SetInput;
-  void SetInput(const HistogramType *histogram);
+  void SetInput(const CoocurrenceMatrixType *coocurrenceMatrix);
 
-  const HistogramType * GetInput() const;
+  const CoocurrenceMatrixType * GetInput() const;
 
   /** Smart Pointer type to a DataObject. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -202,8 +190,8 @@ public:
   MeasurementType GetFeature(TextureFeatureName name);
 
 protected:
-  HistogramToTextureFeaturesFilter();
-  ~HistogramToTextureFeaturesFilter() {}
+  CoocurrenceMatrixToHaralickTextureFeaturesFilter();
+  ~CoocurrenceMatrixToHaralickTextureFeaturesFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
   /** Make a DataObject to be used for output output. */
@@ -214,19 +202,18 @@ protected:
   void GenerateData();
 
 private:
-  HistogramToTextureFeaturesFilter(const Self &); //purposely not implemented
+  CoocurrenceMatrixToHaralickTextureFeaturesFilter(const Self &); //purposely not implemented
   void operator=(const Self &);                   //purposely not implemented
 
   void ComputeMeansAndVariances(double & pixelMean, double & marginalMean,
                                 double & marginalDevSquared, double & pixelVariance);
 
-  RelativeFrequencyContainerType m_RelativeFrequencyContainer;
 };
 } // end of namespace Statistics
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkHistogramToTextureFeaturesFilter.hxx"
+#include "itkCoocurrenceMatrixToHaralickTextureFeaturesFilter.hxx"
 #endif
 
 #endif

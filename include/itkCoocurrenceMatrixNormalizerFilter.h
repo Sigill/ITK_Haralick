@@ -60,7 +60,7 @@ public:
   void GenerateData(void)
   {
     const CoocurrenceMatrixType * const input = this->GetInput();
-    typename CoocurrenceMatrixType::CounterType totalCount = input->GetTotalCount();
+    typename CoocurrenceMatrixType::MeasurementType totalCount = input->GetTotalCount();
     NormalizedCoocurrenceMatrixType *output =
       static_cast< NormalizedCoocurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
@@ -75,7 +75,7 @@ public:
       typename CoocurrenceMatrixType::ConstIterator iit = input->Begin(), iit_end = input->End();
       typename NormalizedCoocurrenceMatrixType::Iterator oit = output->Begin();
 
-      typename NormalizedCoocurrenceMatrixType::CounterType nTotalCount = totalCount;
+      typename NormalizedCoocurrenceMatrixType::MeasurementType nTotalCount = totalCount;
 
       while(iit != iit_end)
         {
@@ -84,7 +84,7 @@ public:
           ++oit;
         }
 
-      output->SetTotalCount(NumericTraits< typename NormalizedCoocurrenceMatrixType::CounterType >::One);
+      output->SetTotalCount(NumericTraits< typename NormalizedCoocurrenceMatrixType::MeasurementType >::One);
       }
 
   }

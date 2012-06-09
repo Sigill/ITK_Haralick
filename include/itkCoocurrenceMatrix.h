@@ -14,8 +14,8 @@ namespace itk
 namespace Statistics
 {
 
-template< class TCounterType = unsigned int > 
-class CoocurrenceMatrix:private std::vector<TCounterType>, public DataObject
+template< class TMeasurementType = unsigned int > 
+class CoocurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
 {
 public:
 
@@ -28,8 +28,10 @@ public:
   /** Run-time type information (and related methods) */
   itkTypeMacro(CoocurrenceMatrix, DataObject);
 
-  typedef TCounterType CounterType;
-  typedef std::vector<CounterType> CounterContainer;
+  typedef TMeasurementType MeasurementType;
+  typedef std::vector<MeasurementType> CounterContainer;
+  typedef unsigned int SizeType;
+  typedef SizeType IndexType;
   typedef typename CounterContainer::iterator Iterator;
   typedef typename CounterContainer::const_iterator ConstIterator;
 
@@ -39,7 +41,7 @@ public:
 
   itkNewMacro(Self);
 
-  void SetSize(const unsigned int size)
+  void SetSize(const SizeType size)
   {
     if(m_Size != size)
       {
@@ -53,18 +55,18 @@ public:
     return m_Size;
   }
 
-  inline CounterType GetTotalCount(void) const
+  inline MeasurementType GetTotalCount(void) const
   {
     return m_TotalCount;
   }
-  inline void SetTotalCount(CounterType v)
+  inline void SetTotalCount(MeasurementType v)
   {
     m_TotalCount = v;
   }
 
   inline void SetToZero()
   {
-    std::fill( CounterContainer::begin(), CounterContainer::end(), NumericTraits< CounterType >::Zero );
+    std::fill( CounterContainer::begin(), CounterContainer::end(), NumericTraits< MeasurementType >::Zero );
     m_TotalCount = 0;
   }
 
@@ -94,11 +96,17 @@ public:
     return CounterContainer::end();
   }
 
-private:
-  unsigned int m_Size;
-  CounterType m_TotalCount;
+  inline void GetIndexes(const IndexType index, IndexType *v1, IndexType *v2) const
+  {
+    *v1 = index % m_Size;
+    *v2 = index / m_Size;
+  }
 
-  inline unsigned int ComputeOffset(const unsigned int v1, const unsigned int v2) const
+private:
+  IndexType m_Size;
+  MeasurementType m_TotalCount;
+
+  inline IndexType ComputeOffset(const IndexType v1, const IndexType v2) const
   {
     return v2 * m_Size + v1;
   }
