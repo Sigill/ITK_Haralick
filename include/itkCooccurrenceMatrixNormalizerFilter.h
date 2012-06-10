@@ -21,12 +21,19 @@ public:
   typedef TFrequencyType FrequencyType;
   typedef CooccurrenceMatrix< FrequencyType > NormalizedCooccurrenceMatrixType;
 
+#ifdef ITK_USE_CONCEPT_CHECKING
+  itkConceptMacro( OutputIsFloatingPointCheck,
+      ( Concept::IsFloatingPoint< FrequencyType > ) );
+#endif
+
   itkTypeMacro(CooccurrenceMatrixNormalizerFilter, ProcessObject);
 
   itkNewMacro(Self);
 
   CooccurrenceMatrixNormalizerFilter()
   {
+    itkDebugMacro("Constructor called");
+
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
 
@@ -59,6 +66,7 @@ public:
 
   void GenerateData(void)
   {
+    itkDebugMacro("Starting normalization");
     const CooccurrenceMatrixType * const input = this->GetInput();
     typename CooccurrenceMatrixType::MeasurementType totalCount = input->GetTotalCount();
     NormalizedCooccurrenceMatrixType *output =
@@ -68,6 +76,7 @@ public:
 
     if(totalCount == 0)
       {
+      itkDebugMacro("Input CooccurrenceMatrix is empty (TotalCounter = 0)");
       output->SetToZero();
       }
     else
@@ -87,6 +96,7 @@ public:
       output->SetTotalCount(NumericTraits< typename NormalizedCooccurrenceMatrixType::MeasurementType >::One);
       }
 
+    itkDebugMacro("Normalization done");
   }
 
 };
