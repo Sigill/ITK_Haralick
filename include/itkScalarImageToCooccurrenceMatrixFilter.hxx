@@ -49,6 +49,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >
 
   offsetVector->push_back(offset);
   this->SetOffsets(offsetVector);
+
+  this->Modified();
 }
 
 template< class TImageType >
@@ -111,6 +113,7 @@ template< class TImageType >
 void
 ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
 {
+  itkDebugMacro( << "GenerateData called" );
   CooccurrenceMatrixType *output =
     static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
@@ -141,6 +144,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::GenerateData(void)
     this->FillCooccurrenceMatrix();
     }
 
+  itkDebugMacro( << "Coocurrence Matrix generated" );
 }
 
 template< class TImageType >
@@ -155,6 +159,8 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCooccurrenceMatrix(void
   CooccurrenceMatrixType *output =
     static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
+  itkDebugMacro( << "Processing region: " << m_RegionOfInterest );
+
   itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(input, m_RegionOfInterest);
   PixelType centerPixelIntensity, offsetPixelIntensity;
   typename ImageType::IndexType centerPixelIndex, offsetPixelIndex;
@@ -164,31 +170,41 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCooccurrenceMatrix(void
   while(!iterator.IsAtEnd())
   {
     centerPixelIndex = iterator.GetIndex();
-    centerPixelIntensity = input->GetPixel(centerPixelIndex);
-    if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
-      {
-      continue; // don't put a pixel in the histogram if the value
-                // is out-of-bounds.
-      }
 
-    for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
+    itkDebugMacro( << "Processing pixel at " << centerPixelIndex );
+
+    centerPixelIntensity = input->GetPixel(centerPixelIndex);
+    // don't put a pixel in the histogram if the value is out of bound
+    if ( centerPixelIntensity >= 0 && centerPixelIntensity < m_NumberOfBinsPerAxis )
       {
+      for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
+        {
         offsetPixelIndex = centerPixelIndex + off_it.Value();
+
+        itkDebugMacro( << "\tProcessing pixel at " << offsetPixelIndex );
 
         if(m_RegionOfInterest.IsInside(offsetPixelIndex))
           {
           offsetPixelIntensity = input->GetPixel(offsetPixelIndex);
 
-          if ( offsetPixelIntensity < 0 || offsetPixelIntensity >= m_NumberOfBinsPerAxis )
+          // don't put a pixel in the histogram if the value is out-of-bounds.
+          if ( offsetPixelIntensity >= 0 && offsetPixelIntensity < m_NumberOfBinsPerAxis )
             {
-            continue; // don't put a pixel in the histogram if the value
-                      // is out-of-bounds.
+            output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+            output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
             }
-
-          output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
-          output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
+          else 
+            {
+              itkDebugMacro( << "\t\tValue (" << offsetPixelIntensity << ") out of bound [0; " << m_NumberOfBinsPerAxis << "[" );
+            }
           }
+        }
       }
+      else 
+      {
+        itkDebugMacro( << "\tValue (" << centerPixelIntensity << ") out of bound [0; " << m_NumberOfBinsPerAxis << "[" );
+      }
+
     ++iterator;
   }
 }
@@ -214,39 +230,34 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >::FillCooccurrenceMatrixWithM
   while(!iterator.IsAtEnd())
   {
     centerPixelIndex = iterator.GetIndex();
-    if ( maskImage->GetPixel(centerPixelIndex) != m_InsidePixelValue )
+    // Go to the next loop if we're not in the mask
+    if ( maskImage->GetPixel(centerPixelIndex) == m_InsidePixelValue )
       {
-      continue; // Go to the next loop if we're not in the mask
-      }
+      centerPixelIntensity = input->GetPixel(centerPixelIndex);
 
-    centerPixelIntensity = input->GetPixel(centerPixelIndex);
-    if ( centerPixelIntensity < 0 || centerPixelIntensity >= m_NumberOfBinsPerAxis )
-      {
-      continue; // don't put a pixel in the histogram if the value
-                // is out-of-bounds.
-      }
-
-    for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
-      {
-        offsetPixelIndex = centerPixelIndex + off_it.Value();
-        if(m_RegionOfInterest.IsInside(offsetPixelIndex))
+      // don't put a pixel in the histogram if the value is out-of-bounds.
+      if ( centerPixelIntensity >= 0 && centerPixelIntensity < m_NumberOfBinsPerAxis )
+        {
+        for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
           {
-          if ( maskImage->GetPixel(offsetPixelIndex) != m_InsidePixelValue )
+          offsetPixelIndex = centerPixelIndex + off_it.Value();
+          if(m_RegionOfInterest.IsInside(offsetPixelIndex))
             {
-            continue; // Go to the next loop if we're not in the mask
+            // Go to the next loop if we're not in the mask
+            if ( maskImage->GetPixel(offsetPixelIndex) == m_InsidePixelValue )
+              {
+              offsetPixelIntensity = input->GetPixel(offsetPixelIndex);
+
+              // don't put a pixel in the histogram if the value is out-of-bounds.
+              if ( offsetPixelIntensity >= 0 && offsetPixelIntensity < m_NumberOfBinsPerAxis )
+                {
+                output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
+                output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
+                }
+              }
             }
-
-          offsetPixelIntensity = input->GetPixel(offsetPixelIndex);
-
-          if ( offsetPixelIntensity < 0 || offsetPixelIntensity >= m_NumberOfBinsPerAxis )
-            {
-            continue; // don't put a pixel in the histogram if the value
-                      // is out-of-bounds.
-            }
-
-          output->IncrementCounter(centerPixelIntensity, offsetPixelIntensity);
-          output->IncrementCounter(offsetPixelIntensity, centerPixelIntensity);
           }
+        }
       }
     ++iterator;
   }

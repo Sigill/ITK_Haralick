@@ -147,6 +147,7 @@ public:
       static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
     output->SetSize(m_NumberOfBinsPerAxis);
+    this->Modified();
   }
   itkGetConstMacro(NumberOfBinsPerAxis, unsigned int);
 
