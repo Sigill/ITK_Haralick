@@ -2,12 +2,14 @@
 #define __itkCooccurrenceMatrix_h
 
 #include <vector>
+#include <iomanip>
 
 #include "itkMacro.h"
 #include "itkObjectFactory.h"
 #include "itkDataObject.h"
 #include "itkSmartPointer.h"
 #include "itkNumericTraits.h"
+#include "itkConceptChecking.h"
 
 namespace itk
 {
@@ -35,19 +37,28 @@ public:
   typedef typename CounterContainer::iterator Iterator;
   typedef typename CounterContainer::const_iterator ConstIterator;
 
+#ifdef ITK_USE_CONCEPT_CHECKING
+  itkConceptMacro( InputHasNumericTraitsCheck,
+      ( Concept::HasNumericTraits< MeasurementType > ) );
+#endif
+
   CooccurrenceMatrix()
-    :CounterContainer(), m_Size(0)
-  {}
+    :CounterContainer(), m_Size(itk::NumericTraits<SizeType>::Zero), m_TotalCount(itk::NumericTraits<MeasurementType>::Zero)
+  {
+    itkDebugMacro(<< "Constructing an empty CooccurrenceMatrix.");
+  }
 
   itkNewMacro(Self);
 
   void SetSize(const SizeType size)
   {
+    itkDebugMacro(<< "Resizing the CooccurrenceMatrix to " << size << ".");
     if(m_Size != size)
       {
       m_Size = size;
       CounterContainer::resize(m_Size * m_Size);
       }
+    this->SetToZero();
   }
 
   inline unsigned int GetSize(void) const
@@ -100,6 +111,25 @@ public:
   {
     *v1 = index % m_Size;
     *v2 = index / m_Size;
+  }
+
+  void PrintSelf(std::ostream & os, Indent indent) const
+  {
+    Superclass::PrintSelf(os, indent);
+    os << indent << "Size: " << this->GetSize() << std::endl;
+    os << indent << "TotalCount: " << this->GetTotalCount() << std::endl;
+    os << indent << "Values: " << std::endl;
+
+    ConstIterator it = this->Begin(), begin = this->Begin(), end = this->End();
+
+    IndexType i1, i2;
+    while(it != end)
+    {
+      GetIndexes(it - begin, &i1, &i2);
+      os << indent.GetNextIndent() << "(" << std::setw(4) << setiosflags(std::ios::left) << i1 << "; " 
+        << std::setw(4) << setiosflags(std::ios::left) << i2 << "): " << (*it) << std::endl;
+      ++it;
+    }
   }
 
 private:
