@@ -16,10 +16,10 @@ class ITK_EXPORT ScalarImageToHaralickTextureFeaturesFilter:public ImageToImageF
 {
 public:
   /** Standard typedefs */
-  typedef ScalarImageToHaralickTextureFeaturesFilter Self;
-  typedef ProcessObject                         Superclass;
-  typedef SmartPointer< Self >                  Pointer;
-  typedef SmartPointer< const Self >            ConstPointer;
+  typedef ScalarImageToHaralickTextureFeaturesFilter              Self;
+  typedef ImageToImageFilter< TInputImageType, TInputImageType>   Superclass;
+  typedef SmartPointer< Self >                                    Pointer;
+  typedef SmartPointer< const Self >                              ConstPointer;
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(ScalarImageToHaralickTextureFeaturesFilter, ImageToImageFilter);
@@ -59,25 +59,18 @@ public:
     this->m_HaralickFeaturesComputer->SetInput(this->m_CooccurrenceMatrixNormalizer->GetOutput());
   }
 
-  void AllocateOutputs()
-  {
-    // Pass the input through as the output
-    InputImagePointer image =
-      const_cast< InputImageType * >( this->GetInput() );
-
-    this->GraftOutput(image);
-  }
-
   using Superclass::SetInput;
   void SetInput(const InputImageType *image)
   {
     this->ProcessObject::SetNthInput( 0, const_cast< InputImageType * >( image ) );
 
     this->m_CooccurrenceMatrixComputer->SetInput(image);
+
+    this->GraftOutput(const_cast< InputImageType * >( image ));
   }
 
 
-  inline typename NormalizedCooccurrenceMatrixType::MeasurementType GetFeature(typename HaralickFeaturesComputer::TextureFeatureName feature)
+  inline typename NormalizedCooccurrenceMatrixType::MeasurementType GetFeature(typename HaralickFeaturesComputer::TextureFeatureName feature) const
   {
     return this->m_HaralickFeaturesComputer->GetFeature(feature);
   }
@@ -91,9 +84,10 @@ public:
   inline void SetOffsets(const OffsetVectorType * offsets)
   {
     this->m_CooccurrenceMatrixComputer->SetOffsets(offsets);
+    this->Modified();
   }
 
-  inline const OffsetVectorType* GetOffsets()
+  inline const OffsetVectorType GetOffsets() const
   {
     return this->m_CooccurrenceMatrixComputer->GetOffset();
   }
@@ -102,9 +96,10 @@ public:
   inline void SetRegionOfInterest(const RegionType roi)
   {
     this->m_CooccurrenceMatrixComputer->SetRegionOfInterest(roi);
+    this->Modified();
   }
 
-  inline const RegionType* GetRegionOfInterest()
+  inline const RegionType GetRegionOfInterest() const
   {
     return this->m_CooccurrenceMatrixComputer->GetRegionOfInterest();
   }
@@ -113,6 +108,7 @@ public:
   inline void SetNumberOfBinsPerAxis(const unsigned char size)
   {
     this->m_CooccurrenceMatrixComputer->SetNumberOfBinsPerAxis(size);
+    this->Modified();
   }
 
   inline const unsigned char GetNumberOfBinsPerAxis()
@@ -123,7 +119,7 @@ public:
   
   void GenerateData(void)
   {
-    this->m_CooccurrenceMatrixComputer->SetInput(static_cast<const InputImageType *>(this->GetInput(0)));
+    itkDebugMacro(<< "GenerateData() called");
     this->m_HaralickFeaturesComputer->Update();
   }
 
