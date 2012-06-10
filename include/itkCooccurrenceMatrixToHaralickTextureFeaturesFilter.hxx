@@ -71,6 +71,7 @@ template< class TCooccurrenceMatrix >
 void
 CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::GenerateData(void)
 {
+  itkDebugMacro(<< "GenerateData() called");
   typedef typename CooccurrenceMatrixType::ConstIterator CooccurrenceMatrixIterator;
 
   const CooccurrenceMatrixType *inputCooccurrenceMatrix = this->GetInput();
@@ -112,8 +113,11 @@ CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::Genera
 
       energy += frequency * frequency;
       entropy -= ( frequency > 0.0001 ) ? frequency *vcl_log(frequency) / log2:0;
-      correlation += ( ( i1 - pixelMean ) * ( i2 - pixelMean ) * frequency )
-                     / pixelDevSquared;
+      if(pixelDevSquared > 0)
+        {
+        correlation += ( ( i1 - pixelMean ) * ( i2 - pixelMean ) * frequency )
+                       / pixelDevSquared;
+        }
       inverseDifferenceMoment += frequency
                                  / ( 1.0 + ( i1 - i2 ) * ( i1 - i2 ) );
       inertia += ( i1 - i2 ) * ( i1 - i2 ) * frequency;
@@ -121,14 +125,20 @@ CooccurrenceMatrixToHaralickTextureFeaturesFilter< TCooccurrenceMatrix >::Genera
                       * frequency;
       clusterProminence += vcl_pow( ( i1 - pixelMean ) + ( i2 - pixelMean ), 4 )
                            * frequency;
-      haralickCorrelation += i1 * i2 * frequency;
+      if(marginalDevSquared > 0)
+        {
+        haralickCorrelation += i1 * i2 * frequency;
+        }
       }
 
     ++cooc_it;
     }
 
-  haralickCorrelation = ( haralickCorrelation - marginalMean * marginalMean )
-                        / marginalDevSquared;
+  if(marginalDevSquared > 0)
+    {
+    haralickCorrelation = ( haralickCorrelation - marginalMean * marginalMean )
+                          / marginalDevSquared;
+    }
 
   MeasurementObjectType *energyOutputObject =
     static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(0) );
