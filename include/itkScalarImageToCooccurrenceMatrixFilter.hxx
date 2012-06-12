@@ -49,6 +49,7 @@ ScalarImageToCooccurrenceMatrixFilter< TImageType >
 
   offsetVector->push_back(offset);
   this->SetOffsets(offsetVector);
+  this->ComputeOffsetsMinRadius();
 
   this->Modified();
 }
