@@ -6,6 +6,8 @@
 #include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
 #include "itkVectorIndexSelectionCastImageFilter.h"
 #include "itkCastImageFilter.h"
+#include "itkStatisticsImageFilter.h"
+#include <vector>
 
 const unsigned int D = 2;
 const unsigned int PosterizationLevel = 4;
@@ -20,6 +22,7 @@ typedef itk::VectorIndexSelectionCastImageFilter< FeaturesImage, FeatureImage > 
 typedef itk::RescaleIntensityImageFilter<FeatureImage, FeatureImage> FeatureImageRescaler;
 typedef itk::CastImageFilter< FeatureImage, InOutImage > CastFilter;
 typedef itk::ImageFileWriter<InOutImage> Writer;
+typedef itk::StatisticsImageFilter< FeatureImage > StatisticsComputer;
 
 int main(int argc, char **argv)
 {
@@ -51,6 +54,9 @@ int main(int argc, char **argv)
   IndexSelectionFilter::Pointer indexSelector = IndexSelectionFilter::New();
   indexSelector->SetInput(haralickComputer->GetOutput());
 
+  StatisticsComputer::Pointer statisticsComputer = StatisticsComputer::New();
+  statisticsComputer->SetInput(indexSelector->GetOutput());
+
   FeatureImageRescaler::Pointer featureImageRescaler = FeatureImageRescaler::New();
   featureImageRescaler->SetInput(indexSelector->GetOutput());
   featureImageRescaler->SetOutputMinimum(0);
@@ -62,38 +68,34 @@ int main(int argc, char **argv)
   Writer::Pointer writer = Writer::New();
   writer->SetInput(castFilter->GetOutput());
 
+  std::vector< std::string > features_name;
+  features_name.push_back("energy");
+  features_name.push_back("entropy");
+  features_name.push_back("correlation");
+  features_name.push_back("inverse_difference_moment");
+  features_name.push_back("inertia");
+  features_name.push_back("cluster_shade");
+  features_name.push_back("cluster_prominence");
+  features_name.push_back("haralick_correlation");
 
-  indexSelector->SetIndex(0);
-  writer->SetFileName("energy.png");
-  writer->Update();
+  std::vector< std::string >::const_iterator names_it = features_name.begin(), names_end = features_name.end();
+  unsigned int i = 0;
+  while(names_it != names_end)
+  {
+    indexSelector->SetIndex(i);
+    writer->SetFileName((*names_it) + ".png");
+    writer->Update();
 
-  indexSelector->SetIndex(1);
-  writer->SetFileName("entropy.png");
-  writer->Update();
+    statisticsComputer->Update();
 
-  indexSelector->SetIndex(2);
-  writer->SetFileName("correlation.png");
-  writer->Update();
+    std::cout << (*names_it) << std::endl;
+    std::cout << "\tMin: " << statisticsComputer->GetMinimum() << std::endl;
+    std::cout << "\tMax: " << statisticsComputer->GetMaximum() << std::endl;
+    std::cout << "\tMean: " << statisticsComputer->GetMean() << std::endl;
+    std::cout << "\tStd.: " << statisticsComputer->GetSigma() << std::endl;
 
-  indexSelector->SetIndex(3);
-  writer->SetFileName("inverse_difference_moment.png");
-  writer->Update();
-
-  indexSelector->SetIndex(4);
-  writer->SetFileName("inertia.png");
-  writer->Update();
-  
-  indexSelector->SetIndex(5);
-  writer->SetFileName("cluster_shade.png");
-  writer->Update();
-
-  indexSelector->SetIndex(6);
-  writer->SetFileName("cluster_prominence.png");
-  writer->Update();
-
-  indexSelector->SetIndex(7);
-  writer->SetFileName("haralick_correlation.png");
-  writer->Update();
+    ++i; ++names_it;
+  }
 
   return 0;
 }
