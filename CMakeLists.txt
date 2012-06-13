@@ -79,6 +79,14 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
+add_executable(ScalarImageToFeatureImages test/ScalarImageToFeatureImages.cpp)
+ 
+if( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(ScalarImageToFeatureImages ITKReview ${ITK_LIBRARIES})
+else( "${ITK_VERSION_MAJOR}" LESS 4 )
+  target_link_libraries(ScalarImageToFeatureImages ${ITK_LIBRARIES})
+endif( "${ITK_VERSION_MAJOR}" LESS 4 )
+
 
 INSTALL( FILES
     include/itkCooccurrenceMatrix.h

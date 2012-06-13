@@ -1,0 +1,8 @@
+get_filename_component(ITK_Haralick_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(EXISTS "${ITK_Haralick_CMAKE_DIR}/CMakeCache.txt")
+  # In build tree
+  include("${ITK_Haralick_CMAKE_DIR}/ITK_HaralickBuildTreeSettings.cmake")
+else()
+  set(ITK_Haralick_INCLUDE_DIRS "${ITK_Haralick_CMAKE_DIR}/@CONF_REL_INCLUDE_DIR@")
+endif()
+ 
