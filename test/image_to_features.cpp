@@ -4,6 +4,8 @@
 
 #include "itkImageRegionIteratorWithIndex.h"
 
+#include <callgrind.h>
+
 const unsigned int W = 200;
 const unsigned int H = 200;
 const unsigned int D = 2;
@@ -51,13 +53,24 @@ int main(int argc, char **argv)
   featuresComputer->SetOffsets(offsetV);
 
   typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::RegionType roi;
-  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::IndexType rIndex = {{ 0, 0 }};
-  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::SizeType rSize = {{ 32, 32 }};
+  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::IndexType rIndex = {{ 1, 0 }};
+  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::SizeType rSize = {{ 7, 7 }};
   roi.SetSize( rSize );
   roi.SetIndex( rIndex );
+
+  //CALLGRIND_START_INSTRUMENTATION 
   featuresComputer->SetRegionOfInterest(roi);
 
   featuresComputer->Update();
+
+  /*
+  rIndex[1] = 1;
+  roi.SetIndex(rIndex);
+  featuresComputer->SetRegionOfInterest(roi);
+
+  featuresComputer->Update();
+  */
+  //CALLGRIND_STOP_INSTRUMENTATION 
 
   std::cout << "Energy: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Energy) << std::endl;
   std::cout << "Entropy: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Entropy) << std::endl;

@@ -2,9 +2,9 @@
 
 #include <itkImageRegionIteratorWithIndex.h>
 
-#include "itkScalarImageToCooccurrenceMatrixFilter.h"
-#include "itkCooccurrenceMatrixNormalizerFilter.h"
-#include "itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
+#include "itkScalarImageToGreyLevelCooccurrenceMatrixFilter.h"
+#include "itkGreyLevelCooccurrenceMatrixNormalizerFilter.h"
+#include "itkGreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
 
 const unsigned int W = 200;
 const unsigned int H = 200;
@@ -12,7 +12,7 @@ const unsigned int D = 2;
 
 typedef itk::Image<unsigned char, D> Image2DType;
 typedef itk::ImageRegionIteratorWithIndex< Image2DType > Image2DIterator;
-typedef itk::Statistics::ScalarImageToCooccurrenceMatrixFilter< Image2DType > Image2DCooccurrenceMatrixComputer;
+typedef itk::Statistics::ScalarImageToGreyLevelCooccurrenceMatrixFilter< Image2DType > Image2DGreyLevelCooccurrenceMatrixComputer;
 
 int main(int argc, char **argv)
 {
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   }
 
 
-  Image2DCooccurrenceMatrixComputer::Pointer cooccurrenceMatrixComputer = Image2DCooccurrenceMatrixComputer::New();
+  Image2DGreyLevelCooccurrenceMatrixComputer::Pointer cooccurrenceMatrixComputer = Image2DGreyLevelCooccurrenceMatrixComputer::New();
 
   Image2DType::RegionType roi;
   Image2DType::IndexType rIndex = {{ 0, 0 }};
@@ -71,14 +71,14 @@ int main(int argc, char **argv)
   cooccurrenceMatrixComputer->SetInput(image);
 
   Image2DType::OffsetType offset1 = {{0, 1}};
-  Image2DCooccurrenceMatrixComputer::OffsetVectorPointer offsetV = Image2DCooccurrenceMatrixComputer::OffsetVector::New();
+  Image2DGreyLevelCooccurrenceMatrixComputer::OffsetVectorPointer offsetV = Image2DGreyLevelCooccurrenceMatrixComputer::OffsetVector::New();
   offsetV->push_back(offset1);
   cooccurrenceMatrixComputer->SetOffsets(offsetV);
 
-  const Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType* cooc = cooccurrenceMatrixComputer->GetOutput();
+  const Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType* cooc = cooccurrenceMatrixComputer->GetOutput();
 
-  itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::Pointer normalizerFilter = 
-    itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::New();
+  itk::Statistics::GreyLevelCooccurrenceMatrixNormalizerFilter< Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType, float >::Pointer normalizerFilter = 
+    itk::Statistics::GreyLevelCooccurrenceMatrixNormalizerFilter< Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType, float >::New();
 
   normalizerFilter->SetInput(cooccurrenceMatrixComputer->GetOutput());
 
@@ -86,8 +86,8 @@ int main(int argc, char **argv)
   cooccurrenceMatrixComputer->Update();
   normalizerFilter->Update();
 
-  typedef typename itk::Statistics::CooccurrenceMatrixNormalizerFilter< Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType, float >::NormalizedCooccurrenceMatrixType NormalizedCooccurrenceMatrix;
-  typedef typename itk::Statistics::CooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedCooccurrenceMatrix > HaralickFeaturesComputer;
+  typedef typename itk::Statistics::GreyLevelCooccurrenceMatrixNormalizerFilter< Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType, float >::NormalizedGreyLevelCooccurrenceMatrixType NormalizedGreyLevelCooccurrenceMatrix;
+  typedef typename itk::Statistics::GreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedGreyLevelCooccurrenceMatrix > HaralickFeaturesComputer;
   HaralickFeaturesComputer::Pointer haralickFeaturesComputer = HaralickFeaturesComputer::New();
   haralickFeaturesComputer->SetInput(normalizerFilter->GetOutput());
 
@@ -98,8 +98,8 @@ int main(int argc, char **argv)
     haralickFeaturesComputer->Update();
   }
 
-  typename NormalizedCooccurrenceMatrix::ConstPointer ncooc = normalizerFilter->GetOutput();
-  typename NormalizedCooccurrenceMatrix::ConstIterator coocIt = ncooc->Begin(), coocBegin = ncooc->Begin(), coocEnd = ncooc->End();
+  typename NormalizedGreyLevelCooccurrenceMatrix::ConstPointer ncooc = normalizerFilter->GetOutput();
+  typename NormalizedGreyLevelCooccurrenceMatrix::ConstIterator coocIt = ncooc->Begin(), coocBegin = ncooc->Begin(), coocEnd = ncooc->End();
 
   unsigned int i1, i2;
   while(coocIt != coocEnd)
@@ -122,10 +122,10 @@ int main(int argc, char **argv)
   std::cout << "HaralickCorrelation: " << haralickFeaturesComputer->GetHaralickCorrelation() << std::endl;
 
   /*
-  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType one_one( hist->GetMeasurementVectorSize() );
-  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType one_two( hist->GetMeasurementVectorSize() );
-  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType two_one( hist->GetMeasurementVectorSize() );
-  Image2DCooccurrenceMatrixComputer::CooccurrenceMatrixType::IndexType two_two( hist->GetMeasurementVectorSize() );
+  Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType::IndexType one_one( hist->GetMeasurementVectorSize() );
+  Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType::IndexType one_two( hist->GetMeasurementVectorSize() );
+  Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType::IndexType two_one( hist->GetMeasurementVectorSize() );
+  Image2DGreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType::IndexType two_two( hist->GetMeasurementVectorSize() );
 
   one_one[0] = 1;
   one_one[1] = 1;

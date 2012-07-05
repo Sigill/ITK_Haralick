@@ -2,9 +2,9 @@
 #define __itkScalarImageToHaralickTextureFeaturesFilter_h
 
 #include "itkImageToImageFilter.h"
-#include "itkScalarImageToCooccurrenceMatrixFilter.h"
-#include "itkCooccurrenceMatrixNormalizerFilter.h"
-#include "itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
+#include "itkScalarImageToGreyLevelCooccurrenceMatrixFilter.h"
+#include "itkGreyLevelCooccurrenceMatrixNormalizerFilter.h"
+#include "itkGreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter.h"
 
 namespace itk
 {
@@ -37,13 +37,13 @@ public:
 
   typedef TOutputPixelType                                  OutputPixelType;
 
-  typedef ScalarImageToCooccurrenceMatrixFilter< InputImageType >                                CooccurrenceMatrixComputer;
-  typedef typename CooccurrenceMatrixComputer::CooccurrenceMatrixType                            CooccurrenceMatrixType;
-  typedef typename CooccurrenceMatrixComputer::OffsetVector                                      OffsetVectorType;
+  typedef ScalarImageToGreyLevelCooccurrenceMatrixFilter< InputImageType >                                GreyLevelCooccurrenceMatrixComputer;
+  typedef typename GreyLevelCooccurrenceMatrixComputer::GreyLevelCooccurrenceMatrixType                            GreyLevelCooccurrenceMatrixType;
+  typedef typename GreyLevelCooccurrenceMatrixComputer::OffsetVector                                      OffsetVectorType;
 
-  typedef CooccurrenceMatrixNormalizerFilter< CooccurrenceMatrixType, OutputPixelType >          CooccurrenceMatrixNormalizer;
-  typedef typename CooccurrenceMatrixNormalizer::NormalizedCooccurrenceMatrixType                NormalizedCooccurrenceMatrixType;
-  typedef CooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedCooccurrenceMatrixType >  HaralickFeaturesComputer;
+  typedef GreyLevelCooccurrenceMatrixNormalizerFilter< GreyLevelCooccurrenceMatrixType, OutputPixelType >          GreyLevelCooccurrenceMatrixNormalizer;
+  typedef typename GreyLevelCooccurrenceMatrixNormalizer::NormalizedGreyLevelCooccurrenceMatrixType                NormalizedGreyLevelCooccurrenceMatrixType;
+  typedef GreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedGreyLevelCooccurrenceMatrixType >  HaralickFeaturesComputer;
 
   ScalarImageToHaralickTextureFeaturesFilter()
   {
@@ -52,11 +52,11 @@ public:
 
     this->ProcessObject::SetNthOutput( 0, static_cast< DataObject * >( InputImageType::New().GetPointer() ) );
 
-    this->m_CooccurrenceMatrixComputer = CooccurrenceMatrixComputer::New();
-    this->m_CooccurrenceMatrixNormalizer = CooccurrenceMatrixNormalizer::New();
-    this->m_CooccurrenceMatrixNormalizer->SetInput(this->m_CooccurrenceMatrixComputer->GetOutput());
+    this->m_GreyLevelCooccurrenceMatrixComputer = GreyLevelCooccurrenceMatrixComputer::New();
+    this->m_GreyLevelCooccurrenceMatrixNormalizer = GreyLevelCooccurrenceMatrixNormalizer::New();
+    this->m_GreyLevelCooccurrenceMatrixNormalizer->SetInput(this->m_GreyLevelCooccurrenceMatrixComputer->GetOutput());
     this->m_HaralickFeaturesComputer = HaralickFeaturesComputer::New();
-    this->m_HaralickFeaturesComputer->SetInput(this->m_CooccurrenceMatrixNormalizer->GetOutput());
+    this->m_HaralickFeaturesComputer->SetInput(this->m_GreyLevelCooccurrenceMatrixNormalizer->GetOutput());
   }
 
   using Superclass::SetInput;
@@ -64,13 +64,13 @@ public:
   {
     this->ProcessObject::SetNthInput( 0, const_cast< InputImageType * >( image ) );
 
-    this->m_CooccurrenceMatrixComputer->SetInput(image);
+    this->m_GreyLevelCooccurrenceMatrixComputer->SetInput(image);
 
     this->GraftOutput(const_cast< InputImageType * >( image ));
   }
 
 
-  inline typename NormalizedCooccurrenceMatrixType::MeasurementType GetFeature(typename HaralickFeaturesComputer::TextureFeatureName feature) const
+  inline typename NormalizedGreyLevelCooccurrenceMatrixType::MeasurementType GetFeature(typename HaralickFeaturesComputer::TextureFeatureName feature) const
   {
     return this->m_HaralickFeaturesComputer->GetFeature(feature);
   }
@@ -83,37 +83,37 @@ public:
 
   inline void SetOffsets(const OffsetVectorType * offsets)
   {
-    this->m_CooccurrenceMatrixComputer->SetOffsets(offsets);
+    this->m_GreyLevelCooccurrenceMatrixComputer->SetOffsets(offsets);
     this->Modified();
   }
 
   inline const OffsetVectorType GetOffsets() const
   {
-    return this->m_CooccurrenceMatrixComputer->GetOffset();
+    return this->m_GreyLevelCooccurrenceMatrixComputer->GetOffset();
   }
 
 
   inline void SetRegionOfInterest(const RegionType roi)
   {
-    this->m_CooccurrenceMatrixComputer->SetRegionOfInterest(roi);
+    this->m_GreyLevelCooccurrenceMatrixComputer->SetRegionOfInterest(roi);
     this->Modified();
   }
 
   inline const RegionType GetRegionOfInterest() const
   {
-    return this->m_CooccurrenceMatrixComputer->GetRegionOfInterest();
+    return this->m_GreyLevelCooccurrenceMatrixComputer->GetRegionOfInterest();
   }
 
 
   inline void SetNumberOfBinsPerAxis(const unsigned char size)
   {
-    this->m_CooccurrenceMatrixComputer->SetNumberOfBinsPerAxis(size);
+    this->m_GreyLevelCooccurrenceMatrixComputer->SetNumberOfBinsPerAxis(size);
     this->Modified();
   }
 
   inline const unsigned char GetNumberOfBinsPerAxis()
   {
-    return this->m_CooccurrenceMatrixComputer->GetNumberOfBinsPerAxis();
+    return this->m_GreyLevelCooccurrenceMatrixComputer->GetNumberOfBinsPerAxis();
   }
 
   
@@ -124,8 +124,8 @@ public:
   }
 
 private:
-  typename CooccurrenceMatrixComputer::Pointer     m_CooccurrenceMatrixComputer;
-  typename CooccurrenceMatrixNormalizer::Pointer   m_CooccurrenceMatrixNormalizer;
+  typename GreyLevelCooccurrenceMatrixComputer::Pointer     m_GreyLevelCooccurrenceMatrixComputer;
+  typename GreyLevelCooccurrenceMatrixNormalizer::Pointer   m_GreyLevelCooccurrenceMatrixNormalizer;
   typename HaralickFeaturesComputer::Pointer       m_HaralickFeaturesComputer;
 
 }; 

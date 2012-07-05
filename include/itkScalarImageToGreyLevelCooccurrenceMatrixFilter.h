@@ -15,11 +15,11 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkScalarImageToCooccurrenceMatrixFilter_h
-#define __itkScalarImageToCooccurrenceMatrixFilter_h
+#ifndef __itkScalarImageToGreyLevelCooccurrenceMatrixFilter_h
+#define __itkScalarImageToGreyLevelCooccurrenceMatrixFilter_h
 
 #include "itkImage.h"
-#include "itkCooccurrenceMatrix.h"
+#include "itkGreyLevelCooccurrenceMatrix.h"
 #include "itkVectorContainer.h"
 #include "itkNumericTraits.h"
 
@@ -27,7 +27,7 @@ namespace itk
 {
 namespace Statistics
 {
-/** \class ScalarImageToCooccurrenceMatrixFilter
+/** \class ScalarImageToGreyLevelCooccurrenceMatrixFilter
  *  \brief This class computes a co-occurence matrix (histogram) from
  * a given image and a mask image if provided. Cooccurrence matrces are
  * used for image texture description.
@@ -80,7 +80,7 @@ namespace Statistics
  * NumericTraits class is the same, and thus cannot hold any larger values,
  * this would cause a float overflow.
  *
- * \sa MaskedScalarImageToCooccurrenceMatrixFilter
+ * \sa MaskedScalarImageToGreyLevelCooccurrenceMatrixFilter
  * \sa HistogramToTextureFeaturesFilter
  * \sa ScalarImageTextureCalculator
  *
@@ -90,17 +90,17 @@ namespace Statistics
  */
 
 template< class TImageType >
-class ITK_EXPORT ScalarImageToCooccurrenceMatrixFilter:public ProcessObject
+class ITK_EXPORT ScalarImageToGreyLevelCooccurrenceMatrixFilter:public ProcessObject
 {
 public:
   /** Standard typedefs */
-  typedef ScalarImageToCooccurrenceMatrixFilter Self;
+  typedef ScalarImageToGreyLevelCooccurrenceMatrixFilter Self;
   typedef ProcessObject                         Superclass;
   typedef SmartPointer< Self >                  Pointer;
   typedef SmartPointer< const Self >            ConstPointer;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ScalarImageToCooccurrenceMatrixFilter, ProcessObject);
+  itkTypeMacro(ScalarImageToGreyLevelCooccurrenceMatrixFilter, ProcessObject);
 
   /** standard New() method support */
   itkNewMacro(Self);
@@ -118,9 +118,9 @@ public:
 
   typedef typename NumericTraits< PixelType >::RealType MeasurementType;
 
-  typedef CooccurrenceMatrix< unsigned int > CooccurrenceMatrixType;
-  typedef typename CooccurrenceMatrixType::Pointer                            CooccurrenceMatrixPointer;
-  typedef typename CooccurrenceMatrixType::ConstPointer                       CooccurrenceMatrixConstPointer;
+  typedef GreyLevelCooccurrenceMatrix< unsigned int > GreyLevelCooccurrenceMatrixType;
+  typedef typename GreyLevelCooccurrenceMatrixType::Pointer                            GreyLevelCooccurrenceMatrixPointer;
+  typedef typename GreyLevelCooccurrenceMatrixType::ConstPointer                       GreyLevelCooccurrenceMatrixConstPointer;
 
   itkStaticConstMacro(DefaultBinsPerAxis, unsigned int, 256);
 
@@ -128,13 +128,10 @@ public:
       Calling either of these methods clears the previous offsets. */
   virtual void SetOffsets (const OffsetVector * _arg)
   {
-    itkDebugMacro("setting " << "Offsets" " to " << _arg);
-    if ( this->m_Offsets != _arg )
-      {
-      this->m_Offsets = _arg;
-      this->Modified();
-      this->ComputeOffsetsMinRadius();
-      }
+    itkDebugMacro("setting offsets to " << _arg);
+    this->m_Offsets = _arg;
+    this->ComputeOffsetsMinRadius();
+    this->Modified();
   }
 
   itkGetConstObjectMacro(Offsets, OffsetVector);
@@ -143,8 +140,8 @@ public:
   void SetNumberOfBinsPerAxis(const unsigned int n)
   {
     m_NumberOfBinsPerAxis = n;
-    CooccurrenceMatrixType *output =
-      static_cast< CooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
+    GreyLevelCooccurrenceMatrixType *output =
+      static_cast< GreyLevelCooccurrenceMatrixType * >( this->ProcessObject::GetOutput(0) );
 
     output->SetSize(m_NumberOfBinsPerAxis);
     this->Modified();
@@ -165,8 +162,8 @@ public:
 
   const ImageType * GetMaskImage() const;
 
-  /** method to get the CooccurrenceMatrix */
-  const CooccurrenceMatrixType * GetOutput() const;
+  /** method to get the GreyLevelCooccurrenceMatrix */
+  const GreyLevelCooccurrenceMatrixType * GetOutput() const;
 
   /** Set the pixel value of the mask that should be considered "inside" the
     object. Defaults to one. */
@@ -174,13 +171,13 @@ public:
   itkGetConstMacro(InsidePixelValue, PixelType);
 
 protected:
-  ScalarImageToCooccurrenceMatrixFilter();
-  virtual ~ScalarImageToCooccurrenceMatrixFilter() {}
+  ScalarImageToGreyLevelCooccurrenceMatrixFilter();
+  virtual ~ScalarImageToGreyLevelCooccurrenceMatrixFilter() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-  virtual void FillCooccurrenceMatrix(void);
+  virtual void FillGreyLevelCooccurrenceMatrix(void);
 
-  virtual void FillCooccurrenceMatrixWithMask(const ImageType *maskImage);
+  virtual void FillGreyLevelCooccurrenceMatrixWithMask(const ImageType *maskImage);
 
   /** Standard itk::ProcessObject subclass method. */
   typedef DataObject::Pointer DataObjectPointer;
@@ -193,7 +190,7 @@ protected:
   virtual void GenerateData();
 
 private:
-  ScalarImageToCooccurrenceMatrixFilter(const Self &); //purposely not
+  ScalarImageToGreyLevelCooccurrenceMatrixFilter(const Self &); //purposely not
                                                        // implemented
   void operator=(const Self &);                        //purposely not
 
@@ -214,7 +211,7 @@ private:
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkScalarImageToCooccurrenceMatrixFilter.hxx"
+#include "itkScalarImageToGreyLevelCooccurrenceMatrixFilter.hxx"
 #endif
 
 #endif

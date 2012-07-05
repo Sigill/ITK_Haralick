@@ -2,7 +2,7 @@
 #include <itkVectorContainer.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkConstNeighborhoodIterator.h>
-#include "itkCooccurrenceMatrix.h"
+#include "itkGreyLevelCooccurrenceMatrix.h"
 
 const unsigned int W = 16;
 const unsigned int H = 16;
@@ -19,7 +19,9 @@ typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
 typedef typename OffsetVector::Pointer OffsetVectorPointer;
 
-typedef itk::Statistics::CooccurrenceMatrix< unsigned int > CooccurrenceMatrixType;
+typedef itk::Statistics::GreyLevelCooccurrenceMatrix< unsigned int > GreyLevelCooccurrenceMatrixType;
+
+
 
 int main(int argc, char **argv)
 {
@@ -27,17 +29,26 @@ int main(int argc, char **argv)
 
   ImageType::RegionType imageRegion;
 
+  // Allocates the image
   {
     ImageType::IndexType index = {{ 0, 0, 0 }};
     ImageType::SizeType imageSize = {{ W, H, D }};
 
     imageRegion.SetIndex( index );
     imageRegion.SetSize( imageSize );
+
+    image->SetRegions( imageRegion );
+    image->Allocate();
   }
 
-  image->SetRegions( imageRegion );
-  image->Allocate();
-
+  // Build an image looking like this:
+  //-------------
+  //  1 2 1 2 1
+  //  1 2 1 2 1
+  //  1 2 1 2 1
+  //  1 2 1 2 1
+  //  1 2 1 2 1
+  //-------------
   {
     IteratorWidx imageIt( image, imageRegion );
     ImageType::IndexType ind;
@@ -48,6 +59,7 @@ int main(int argc, char **argv)
     }
   }
 
+  // Creates two offsets to be considered when calculating cooccurrences
   OffsetVectorPointer offsets = OffsetVector::New();
   {
     OffsetType off;
@@ -57,6 +69,7 @@ int main(int argc, char **argv)
     offsets->push_back(off);
   }
 
+  // Computes the smallest radius of the offsets
   ImageType::OffsetType offsetsRadius; offsetsRadius.Fill(0);
   {
     OffsetVector::ConstIterator off_it;
@@ -72,7 +85,6 @@ int main(int argc, char **argv)
       }
     }
   }
-
   std::cout << "Offsets minimal radius: " << offsetsRadius << std::endl;
 
   ImageType::RegionType windowRegion;
@@ -82,7 +94,7 @@ int main(int argc, char **argv)
 
   std::cout << "Window size: " << windowSize << std::endl;
 
-  typename CooccurrenceMatrixType::Pointer cooccurrenceMatrix = CooccurrenceMatrixType::New();
+  typename GreyLevelCooccurrenceMatrixType::Pointer cooccurrenceMatrix = GreyLevelCooccurrenceMatrixType::New();
   cooccurrenceMatrix->SetSize(16);
 
   ImageType::IndexType pixelIndex;
@@ -94,27 +106,30 @@ int main(int argc, char **argv)
   ConstIteratorWidx iit(image, imageRegion);
   iit.GoToBegin();
   while(!iit.IsAtEnd()) {
+    // Computes the region where cooccurrences will be searched
     windowIndex = iit.GetIndex();
     //std::cout << windowIndex << std::endl;
     windowIndex -= windowRadius;
-
     windowRegion.SetIndex(windowIndex);
     windowRegion.SetSize(windowSize);
     windowRegion.Crop(imageRegion);
 
     cooccurrenceMatrix->SetToZero();
 
-    ConstIteratorWidx wit(image, windowRegion);
+    ConstIteratorWidx wit(image, &windowRegion);
     wit.GoToBegin();
+    // For each pixel of the region
     while(!wit.IsAtEnd())
     {
       centerPixelIndex = wit.GetIndex();
       centerPixelIntensity = image->GetPixel(centerPixelIndex);
 
+      // For each offset
       for ( off_it = off_it_begin; off_it != off_it_end; ++off_it )
       {
         offsetPixelIndex = centerPixelIndex + off_it.Value();
 
+        // If this offset is inside the image
         if(windowRegion.IsInside(offsetPixelIndex))
         {
           offsetPixelIntensity = image->GetPixel(offsetPixelIndex);
@@ -127,7 +142,7 @@ int main(int argc, char **argv)
     }
 
     /*
-    typename CooccurrenceMatrixType::ConstIterator begin = cooccurrenceMatrix.begin(), it = cooccurrenceMatrix.begin(), end = cooccurrenceMatrix.end();
+    typename GreyLevelCooccurrenceMatrixType::ConstIterator begin = cooccurrenceMatrix.begin(), it = cooccurrenceMatrix.begin(), end = cooccurrenceMatrix.end();
     while(it < end)
     {
       std::cout << (it - begin) << " -> " << *it << std::endl;

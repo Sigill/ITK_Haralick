@@ -1,5 +1,5 @@
-#ifndef __itkCooccurrenceMatrix_h
-#define __itkCooccurrenceMatrix_h
+#ifndef __itkGreyLevelCooccurrenceMatrix_h
+#define __itkGreyLevelCooccurrenceMatrix_h
 
 #include <vector>
 #include <iomanip>
@@ -16,19 +16,29 @@ namespace itk
 namespace Statistics
 {
 
+/** \class GreyLevelCooccurrenceMatrix
+ *  \brief This class is used to count coocurrence of two grey levels.
+ *
+ * A cooccurrence matrix can be seen as a 2-dimensional histogram where each 
+ * dimension represent the occurrence of grey level.
+ *
+ * Grey levels are represented by their value, from 0 to N-1, where N is the
+ * size of the matrix.
+ **/
+
 template< class TMeasurementType = unsigned int > 
-class CooccurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
+class GreyLevelCooccurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
 {
 public:
 
   /** Standard class typedefs */
-  typedef CooccurrenceMatrix          Self;
+  typedef GreyLevelCooccurrenceMatrix         Self;
   typedef DataObject                 Superclass;
   typedef SmartPointer< Self >       Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
   /** Run-time type information (and related methods) */
-  itkTypeMacro(CooccurrenceMatrix, DataObject);
+  itkTypeMacro(GreyLevelCooccurrenceMatrix, DataObject);
 
   typedef TMeasurementType MeasurementType;
   typedef std::vector<MeasurementType> CounterContainer;
@@ -42,17 +52,19 @@ public:
       ( Concept::HasNumericTraits< MeasurementType > ) );
 #endif
 
-  CooccurrenceMatrix()
+  GreyLevelCooccurrenceMatrix()
     :CounterContainer(), m_Size(itk::NumericTraits<SizeType>::Zero), m_TotalCount(itk::NumericTraits<MeasurementType>::Zero)
   {
-    itkDebugMacro(<< "Constructing an empty CooccurrenceMatrix.");
+    itkDebugMacro(<< "Constructing an empty GreyLevelCooccurrenceMatrix.");
   }
 
   itkNewMacro(Self);
 
+  /** Resizes the matrix to the specified size (only if necessary)
+   * and set every measures to 0. */
   void SetSize(const SizeType size)
   {
-    itkDebugMacro(<< "Resizing the CooccurrenceMatrix to " << size << ".");
+    itkDebugMacro(<< "Resizing the GreyLevelCooccurrenceMatrix to " << size << ".");
     if(m_Size != size)
       {
       m_Size = size;
@@ -147,8 +159,8 @@ private:
 
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkCooccurrenceMatrix.hxx"
+#include "itkGreyLevelCooccurrenceMatrix.hxx"
 #endif
 
-#endif /* __itkCooccurrenceMatrix_h */
+#endif /* __itkGreyLevelCooccurrenceMatrix_h */
 

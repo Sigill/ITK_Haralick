@@ -39,12 +39,12 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(haralick_iterations ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
-add_executable(cooccurrence_matrix test/cooccurrence_matrix.cpp)
+add_executable(GreyLevelCooccurrenceMatrix test/GreyLevelCooccurrenceMatrix.cpp)
  
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(cooccurrence_matrix ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(GreyLevelCooccurrenceMatrix ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(cooccurrence_matrix ${ITK_LIBRARIES})
+  target_link_libraries(GreyLevelCooccurrenceMatrix ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 add_executable(filters test/filters.cpp)

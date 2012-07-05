@@ -1,9 +1,9 @@
-#include "itkCooccurrenceMatrix.h"
+#include "itkGreyLevelCooccurrenceMatrix.h"
 #include "itkNumericTraits.h"
 
-typedef itk::Statistics::CooccurrenceMatrix< unsigned int > CooccurrenceMatrix;
+typedef itk::Statistics::GreyLevelCooccurrenceMatrix< unsigned int > GreyLevelCooccurrenceMatrix;
 
-bool assertSizeIs(const CooccurrenceMatrix * const m, const CooccurrenceMatrix::SizeType s)
+bool assertSizeIs(const GreyLevelCooccurrenceMatrix * const m, const GreyLevelCooccurrenceMatrix::SizeType s)
 {
   if(m->GetSize() != s)
   {
@@ -13,7 +13,7 @@ bool assertSizeIs(const CooccurrenceMatrix * const m, const CooccurrenceMatrix::
   return true;
 }
 
-bool assertTotalCountIs(const CooccurrenceMatrix * const m, const CooccurrenceMatrix::MeasurementType s)
+bool assertTotalCountIs(const GreyLevelCooccurrenceMatrix * const m, const GreyLevelCooccurrenceMatrix::MeasurementType s)
 {
   if(m->GetTotalCount() != s)
   {
@@ -23,10 +23,10 @@ bool assertTotalCountIs(const CooccurrenceMatrix * const m, const CooccurrenceMa
   return true;
 }
 
-bool assertIsZeroEverywhere(const CooccurrenceMatrix * const m)
+bool assertIsZeroEverywhere(const GreyLevelCooccurrenceMatrix * const m)
 {
-  typename CooccurrenceMatrix::ConstIterator it = m->Begin(), end = m->End();
-  typename CooccurrenceMatrix::MeasurementType zero = itk::NumericTraits< CooccurrenceMatrix::MeasurementType >::Zero;
+  typename GreyLevelCooccurrenceMatrix::ConstIterator it = m->Begin(), end = m->End();
+  typename GreyLevelCooccurrenceMatrix::MeasurementType zero = itk::NumericTraits< GreyLevelCooccurrenceMatrix::MeasurementType >::Zero;
 
   while(it != end)
   {
@@ -41,7 +41,7 @@ bool assertIsZeroEverywhere(const CooccurrenceMatrix * const m)
 }
 
 int main(void) {
-  CooccurrenceMatrix::Pointer matrix = CooccurrenceMatrix::New();
+  GreyLevelCooccurrenceMatrix::Pointer matrix = GreyLevelCooccurrenceMatrix::New();
   if(!assertSizeIs(matrix, 0))
     exit(-1);
 
@@ -62,8 +62,8 @@ int main(void) {
   if(!assertTotalCountIs(matrix, 1))
     exit(-1);
 
-  typename CooccurrenceMatrix::ConstIterator it = matrix->Begin(), begin = matrix->Begin(), end = matrix->End();
-  typename CooccurrenceMatrix::IndexType i1, i2;
+  typename GreyLevelCooccurrenceMatrix::ConstIterator it = matrix->Begin(), begin = matrix->Begin(), end = matrix->End();
+  typename GreyLevelCooccurrenceMatrix::IndexType i1, i2;
   while(it != end)
   {
     matrix->GetIndexes(it - begin, &i1, &i2);
@@ -71,7 +71,7 @@ int main(void) {
     {
       if(*it != 1)
       {
-        std::cout << "Cooccurrence (3, 3) has a value of " << (*it) << ", shoule have a value of 1." << std::endl;
+        std::cout << "Cooccurrence (3, 3) has a value of " << (*it) << ", should have a value of 1." << std::endl;
         exit(-1);
       }
       break;
