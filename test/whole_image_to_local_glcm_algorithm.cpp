@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 
     cooccurrenceMatrix->SetToZero();
 
-    ConstIteratorWidx wit(image, &windowRegion);
+    ConstIteratorWidx wit(image, windowRegion);
     wit.GoToBegin();
     // For each pixel of the region
     while(!wit.IsAtEnd())

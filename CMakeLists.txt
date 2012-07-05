@@ -31,12 +31,12 @@ foreach(p INCLUDE CMAKE)
 endforeach()
 
  
-add_executable(haralick_iterations test/haralick_iterations.cpp)
+add_executable(whole_image_to_local_glcm_algorithm test/whole_image_to_local_glcm_algorithm.cpp)
  
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(haralick_iterations ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(whole_image_to_local_glcm_algorithm ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(haralick_iterations ${ITK_LIBRARIES})
+  target_link_libraries(whole_image_to_local_glcm_algorithm ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 add_executable(GreyLevelCooccurrenceMatrix test/GreyLevelCooccurrenceMatrix.cpp)
