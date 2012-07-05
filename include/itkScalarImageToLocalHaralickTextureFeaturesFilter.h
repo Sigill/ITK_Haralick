@@ -1,5 +1,5 @@
-#ifndef __itkScalarImageToHaralickTextureFeaturesFilter_h
-#define __itkScalarImageToHaralickTextureFeaturesFilter_h
+#ifndef __itkScalarImageToLocalHaralickTextureFeaturesFilter_h
+#define __itkScalarImageToLocalHaralickTextureFeaturesFilter_h
 
 #include "itkImageToImageFilter.h"
 #include "itkScalarImageToGreyLevelCooccurrenceMatrixFilter.h"
@@ -12,17 +12,17 @@ namespace Statistics
 {
 
 template< class TInputImageType, class TOutputPixelType >
-class ITK_EXPORT ScalarImageToHaralickTextureFeaturesFilter:public ImageToImageFilter< TInputImageType, TInputImageType>
+class ITK_EXPORT ScalarImageToLocalHaralickTextureFeaturesFilter:public ImageToImageFilter< TInputImageType, TInputImageType>
 {
 public:
   /** Standard typedefs */
-  typedef ScalarImageToHaralickTextureFeaturesFilter              Self;
+  typedef ScalarImageToLocalHaralickTextureFeaturesFilter              Self;
   typedef ImageToImageFilter< TInputImageType, TInputImageType>   Superclass;
   typedef SmartPointer< Self >                                    Pointer;
   typedef SmartPointer< const Self >                              ConstPointer;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ScalarImageToHaralickTextureFeaturesFilter, ImageToImageFilter);
+  itkTypeMacro(ScalarImageToLocalHaralickTextureFeaturesFilter, ImageToImageFilter);
 
   /** standard New() method support */
   itkNewMacro(Self);
@@ -45,7 +45,7 @@ public:
   typedef typename GreyLevelCooccurrenceMatrixNormalizer::NormalizedGreyLevelCooccurrenceMatrixType                NormalizedGreyLevelCooccurrenceMatrixType;
   typedef GreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter< NormalizedGreyLevelCooccurrenceMatrixType >  HaralickFeaturesComputer;
 
-  ScalarImageToHaralickTextureFeaturesFilter()
+  ScalarImageToLocalHaralickTextureFeaturesFilter()
   {
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
@@ -79,6 +79,7 @@ public:
   inline void SetOffset(const OffsetType offset)
   {
     this->m_CooccurrenMatrixComputer->SetOffset(offset);
+    this->Modified();
   }
 
   inline void SetOffsets(const OffsetVectorType * offsets)
@@ -133,4 +134,4 @@ private:
 } // End of namespace Statistics
 } // End of namespace itk
 
-#endif /* __itkScalarImageToHaralickTextureFeaturesFilter_h */
+#endif /* __itkScalarImageToLocalHaralickTextureFeaturesFilter_h */

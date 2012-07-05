@@ -1,7 +1,7 @@
 #ifndef __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 #define __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 
-#include "itkScalarImageToHaralickTextureFeaturesFilter.h"
+#include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
 #include "itkVectorImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
@@ -31,7 +31,7 @@ public:
   typedef typename InputImageType::PixelType    InputPixelType;
   typedef ::itk::Size< itkGetStaticConstMacro(ImageDimension) >    RadiusType;
 
-  typedef ScalarImageToHaralickTextureFeaturesFilter< InputImageType, OutputPixelType > LocalHaralickComputer;
+  typedef ScalarImageToLocalHaralickTextureFeaturesFilter< InputImageType, OutputPixelType > LocalHaralickComputer;
 
   typedef typename LocalHaralickComputer::OffsetType         OffsetType;
   typedef typename LocalHaralickComputer::OffsetVectorType   OffsetVectorType;

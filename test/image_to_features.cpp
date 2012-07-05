@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "itkScalarImageToHaralickTextureFeaturesFilter.h"
+#include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
 
 #include "itkImageRegionIteratorWithIndex.h"
 
@@ -12,7 +12,7 @@ const unsigned int D = 2;
 
 typedef itk::Image<unsigned char, D> ImageType;
 typedef itk::ImageRegionIteratorWithIndex< ImageType > ImageIterator;
-typedef typename itk::Statistics::ScalarImageToHaralickTextureFeaturesFilter< ImageType, double  > ScalarImageToHaralickTextureFeaturesFilter;
+typedef typename itk::Statistics::ScalarImageToLocalHaralickTextureFeaturesFilter< ImageType, double  > ScalarImageToLocalHaralickTextureFeaturesFilter;
 
 int main(int argc, char **argv)
 {
@@ -41,20 +41,20 @@ int main(int argc, char **argv)
     }
   }
 
-  typename ScalarImageToHaralickTextureFeaturesFilter::Pointer featuresComputer = ScalarImageToHaralickTextureFeaturesFilter::New();
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::Pointer featuresComputer = ScalarImageToLocalHaralickTextureFeaturesFilter::New();
 
   featuresComputer->SetNumberOfBinsPerAxis(4);
 
   featuresComputer->SetInput(image);
 
-  typename ScalarImageToHaralickTextureFeaturesFilter::OffsetType offset1 = {{0, 1}};
-  typename ScalarImageToHaralickTextureFeaturesFilter::OffsetVectorType::Pointer offsetV = ScalarImageToHaralickTextureFeaturesFilter::OffsetVectorType::New();
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::OffsetType offset1 = {{0, 1}};
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::OffsetVectorType::Pointer offsetV = ScalarImageToLocalHaralickTextureFeaturesFilter::OffsetVectorType::New();
   offsetV->push_back(offset1);
   featuresComputer->SetOffsets(offsetV);
 
-  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::RegionType roi;
-  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::IndexType rIndex = {{ 1, 0 }};
-  typename ScalarImageToHaralickTextureFeaturesFilter::InputImageType::SizeType rSize = {{ 7, 7 }};
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::InputImageType::RegionType roi;
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::InputImageType::IndexType rIndex = {{ 1, 0 }};
+  typename ScalarImageToLocalHaralickTextureFeaturesFilter::InputImageType::SizeType rSize = {{ 7, 7 }};
   roi.SetSize( rSize );
   roi.SetIndex( rIndex );
 
@@ -72,14 +72,14 @@ int main(int argc, char **argv)
   */
   //CALLGRIND_STOP_INSTRUMENTATION 
 
-  std::cout << "Energy: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Energy) << std::endl;
-  std::cout << "Entropy: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Entropy) << std::endl;
-  std::cout << "Correlation: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Correlation) << std::endl;
-  std::cout << "InverseDifferenceMoment: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::InverseDifferenceMoment) << std::endl;
-  std::cout << "Inertia: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Inertia) << std::endl;
-  std::cout << "ClusterShade: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::ClusterShade) << std::endl;
-  std::cout << "ClusterProminence: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::ClusterProminence) << std::endl;
-  std::cout << "HaralickCorrelation: " << featuresComputer->GetFeature(ScalarImageToHaralickTextureFeaturesFilter::HaralickFeaturesComputer::HaralickCorrelation) << std::endl;
+  std::cout << "Energy: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Energy) << std::endl;
+  std::cout << "Entropy: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Entropy) << std::endl;
+  std::cout << "Correlation: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Correlation) << std::endl;
+  std::cout << "InverseDifferenceMoment: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::InverseDifferenceMoment) << std::endl;
+  std::cout << "Inertia: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::Inertia) << std::endl;
+  std::cout << "ClusterShade: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::ClusterShade) << std::endl;
+  std::cout << "ClusterProminence: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::ClusterProminence) << std::endl;
+  std::cout << "HaralickCorrelation: " << featuresComputer->GetFeature(ScalarImageToLocalHaralickTextureFeaturesFilter::HaralickFeaturesComputer::HaralickCorrelation) << std::endl;
 
   return 0;
 }
