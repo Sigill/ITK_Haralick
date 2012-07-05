@@ -1,5 +1,5 @@
-#ifndef __itkScalarImageToLocalHaralickTextureFeaturesFilter_h
-#define __itkScalarImageToLocalHaralickTextureFeaturesFilter_h
+#ifndef __itkScalarImageToHaralickTextureFeaturesImageFilter_h
+#define __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 
 #include "itkScalarImageToHaralickTextureFeaturesFilter.h"
 #include "itkVectorImage.h"
@@ -11,12 +11,12 @@ namespace Statistics
 {
 
 template< class TInputImageType, class TOutputPixelType >
-class ITK_EXPORT ScalarImageToLocalHaralickTextureFeaturesFilter:
+class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
   public ImageToImageFilter< TInputImageType, VectorImage< TOutputPixelType, ::itk::GetImageDimension< TInputImageType >::ImageDimension > >
 {
 public:
   /** Standard typedefs */
-  typedef ScalarImageToLocalHaralickTextureFeaturesFilter   Self;
+  typedef ScalarImageToHaralickTextureFeaturesImageFilter   Self;
   typedef TInputImageType                                   InputImageType;
   typedef TOutputPixelType                                  OutputPixelType;
 
@@ -37,12 +37,12 @@ public:
   typedef typename LocalHaralickComputer::OffsetVectorType   OffsetVectorType;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ScalarImageToLocalHaralickTextureFeaturesFilter, ImageToImageFilter);
+  itkTypeMacro(ScalarImageToHaralickTextureFeaturesImageFilter, ImageToImageFilter);
 
   /** standard New() method support */
   itkNewMacro(Self);
 
-  ScalarImageToLocalHaralickTextureFeaturesFilter()
+  ScalarImageToHaralickTextureFeaturesImageFilter()
   {
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
@@ -200,5 +200,5 @@ private:
 } // End of namespace Statistics
 } // End of namespace itk
 
-#endif /* __itkScalarImageToLocalHaralickTextureFeaturesFilter_h */
+#endif /* __itkScalarImageToHaralickTextureFeaturesImageFilter_h */
 

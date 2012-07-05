@@ -63,12 +63,12 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(image_to_features ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
-add_executable(image_to_local_features test/image_to_local_features.cpp)
+add_executable(ScalarImageToHaralickTextureFeaturesImage test/ScalarImageToHaralickTextureFeaturesImage.cpp)
  
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(image_to_local_features ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(image_to_local_features ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 add_executable(ScalarImageToHaralickTextureFeatures_loop test/ScalarImageToHaralickTextureFeatures_loop.cpp)
@@ -79,12 +79,12 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
-add_executable(ScalarImageToFeatureImages test/ScalarImageToFeatureImages.cpp)
+add_executable(ScalarImageToHaralickTextureFeaturesImage_statistics test/ScalarImageToHaralickTextureFeaturesImage_statistics.cpp)
  
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(ScalarImageToFeatureImages ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(ScalarImageToFeatureImages ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 

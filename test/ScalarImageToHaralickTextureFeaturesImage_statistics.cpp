@@ -3,7 +3,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkRescaleIntensityImageFilter.h"
-#include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
+#include "itkScalarImageToHaralickTextureFeaturesImageFilter.h"
 #include "itkVectorIndexSelectionCastImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkStatisticsImageFilter.h"
@@ -15,8 +15,8 @@ const unsigned int PosterizationLevel = 4;
 typedef itk::Image< unsigned char, D > InOutImage;
 typedef itk::ImageFileReader< InOutImage > Reader;
 typedef itk::RescaleIntensityImageFilter< InOutImage, InOutImage > ImageRescaler;
-typedef typename itk::Statistics::ScalarImageToLocalHaralickTextureFeaturesFilter< InOutImage, double  > HaralickFeaturesFilter;
-typedef typename HaralickFeaturesFilter::OutputImageType FeaturesImage;
+typedef typename itk::Statistics::ScalarImageToHaralickTextureFeaturesImageFilter< InOutImage, double  > ScalarImageToHaralickTextureFeaturesImageFilter;
+typedef typename ScalarImageToHaralickTextureFeaturesImageFilter::OutputImageType FeaturesImage;
 typedef itk::Image< double, D > FeatureImage;
 typedef itk::VectorIndexSelectionCastImageFilter< FeaturesImage, FeatureImage > IndexSelectionFilter;
 typedef itk::RescaleIntensityImageFilter<FeatureImage, FeatureImage> FeatureImageRescaler;
@@ -40,14 +40,14 @@ int main(int argc, char **argv)
   rescaler->SetOutputMinimum(0);
   rescaler->SetOutputMaximum(PosterizationLevel);
 
-  HaralickFeaturesFilter::Pointer haralickComputer = HaralickFeaturesFilter::New();
-  HaralickFeaturesFilter::RadiusType windowRadius; windowRadius.Fill(3);
+  ScalarImageToHaralickTextureFeaturesImageFilter::Pointer haralickComputer = ScalarImageToHaralickTextureFeaturesImageFilter::New();
+  ScalarImageToHaralickTextureFeaturesImageFilter::RadiusType windowRadius; windowRadius.Fill(3);
   haralickComputer->SetInput(rescaler->GetOutput());
   haralickComputer->SetWindowRadius(windowRadius);
   haralickComputer->SetNumberOfBinsPerAxis(PosterizationLevel);
 
-  HaralickFeaturesFilter::OffsetType offset1 = {{0, 1}};
-  HaralickFeaturesFilter::OffsetVectorType::Pointer offsets = HaralickFeaturesFilter::OffsetVectorType::New();
+  ScalarImageToHaralickTextureFeaturesImageFilter::OffsetType offset1 = {{0, 1}};
+  ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::Pointer offsets = ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::New();
   offsets->push_back(offset1);
   haralickComputer->SetOffsets(offsets);
 
