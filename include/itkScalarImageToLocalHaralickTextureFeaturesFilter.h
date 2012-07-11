@@ -90,7 +90,7 @@ public:
 
   inline const OffsetVectorType GetOffsets() const
   {
-    return this->m_GreyLevelCooccurrenceMatrixComputer->GetOffset();
+    return this->m_GreyLevelCooccurrenceMatrixComputer->GetOffsets();
   }
 
 

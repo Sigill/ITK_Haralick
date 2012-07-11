@@ -119,7 +119,7 @@ public:
 
   inline const OffsetVectorType* GetOffsets()
   {
-    return this->m_LocalHaralickComputer->GetOffset();
+    return this->m_LocalHaralickComputer->GetOffsets();
   }
 
 

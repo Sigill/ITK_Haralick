@@ -89,15 +89,15 @@ endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 
 INSTALL( FILES
-    include/itkCooccurrenceMatrix.h
-    include/itkCooccurrenceMatrix.hxx
-    include/itkCooccurrenceMatrixNormalizerFilter.h
-    include/itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.h
-    include/itkCooccurrenceMatrixToHaralickTextureFeaturesFilter.hxx
-    include/itkScalarImageToCooccurrenceMatrixFilter.h
-    include/itkScalarImageToCooccurrenceMatrixFilter.hxx
-    include/itkScalarImageToHaralickTextureFeaturesFilter.h
+    include/itkGreyLevelCooccurrenceMatrix.h
+    include/itkGreyLevelCooccurrenceMatrix.hxx
+    include/itkGreyLevelCooccurrenceMatrixNormalizerFilter.h
+    include/itkGreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter.h
+    include/itkGreyLevelCooccurrenceMatrixToHaralickTextureFeaturesFilter.hxx
+    include/itkScalarImageToGreyLevelCooccurrenceMatrixFilter.h
+    include/itkScalarImageToGreyLevelCooccurrenceMatrixFilter.hxx
     include/itkScalarImageToLocalHaralickTextureFeaturesFilter.h
+    include/itkScalarImageToHaralickTextureFeaturesImageFilter.h
     DESTINATION "${INSTALL_DIR_INCLUDE}")
 
 
