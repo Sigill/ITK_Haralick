@@ -2,7 +2,6 @@
 #define __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 
 #include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
-#include "itkVectorImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
 
 namespace itk
@@ -10,19 +9,20 @@ namespace itk
 namespace Statistics
 {
 
-template< class TInputImageType, class TOutputPixelType >
+template< class TInputImageType, class TFeatureType >
 class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
-  public ImageToImageFilter< TInputImageType, VectorImage< TOutputPixelType, ::itk::GetImageDimension< TInputImageType >::ImageDimension > >
+  public ImageToImageFilter< TInputImageType, Image< FixedArray< TFeatureType, 8 >, ::itk::GetImageDimension< TInputImageType >::ImageDimension > >
 {
 public:
   /** Standard typedefs */
   typedef ScalarImageToHaralickTextureFeaturesImageFilter   Self;
   typedef TInputImageType                                   InputImageType;
-  typedef TOutputPixelType                                  OutputPixelType;
+  typedef TFeatureType                                      FeatureType;
+  typedef FixedArray< TFeatureType, 8 >                     OutputPixelType;
 
   itkStaticConstMacro(ImageDimension, unsigned int, ::itk::GetImageDimension< InputImageType >::ImageDimension);
 
-  typedef VectorImage< OutputPixelType, itkGetStaticConstMacro(ImageDimension) >   OutputImageType;
+  typedef Image< OutputPixelType, itkGetStaticConstMacro(ImageDimension) >   OutputImageType;
 
   typedef ImageToImageFilter< InputImageType, OutputImageType >   Superclass;
   typedef SmartPointer< Self >                                    Pointer;
@@ -31,7 +31,7 @@ public:
   typedef typename InputImageType::PixelType    InputPixelType;
   typedef ::itk::Size< itkGetStaticConstMacro(ImageDimension) >    RadiusType;
 
-  typedef ScalarImageToLocalHaralickTextureFeaturesFilter< InputImageType, OutputPixelType > LocalHaralickComputer;
+  typedef ScalarImageToLocalHaralickTextureFeaturesFilter< InputImageType, FeatureType > LocalHaralickComputer;
 
   typedef typename LocalHaralickComputer::OffsetType         OffsetType;
   typedef typename LocalHaralickComputer::OffsetVectorType   OffsetVectorType;
@@ -46,6 +46,11 @@ public:
   {
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
+
+    RadiusType defaultRadius;
+    defaultRadius.Fill(0);
+    defaultRadius[0] = 1;
+    this->m_WindowRadius = defaultRadius;
 
     this->m_LocalHaralickComputer = LocalHaralickComputer::New();
 
@@ -95,8 +100,8 @@ public:
     // the output itk::VectorImage
     this->Superclass::GenerateOutputInformation();
 
-    OutputImageType *output = this->GetOutput();
-    output->SetNumberOfComponentsPerPixel( 8 );
+    //OutputImageType *output = this->GetOutput();
+    //output->SetNumberOfComponentsPerPixel( 8 );
   }
 
   void SetInput(const InputImageType *image)
@@ -150,9 +155,12 @@ public:
       windowSize.SetElement(i, (m_WindowRadius.GetElement(i) << 1) + 1);
       }
 
+    /*
     typedef itk::VariableLengthVector<double> VariableVectorType;
     VariableVectorType features;
     features.SetSize(8);
+    */
+    OutputPixelType features;
 
     output->SetBufferedRegion( output->GetRequestedRegion() );
     output->Allocate();
