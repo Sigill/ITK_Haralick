@@ -30,63 +30,34 @@ foreach(p INCLUDE CMAKE)
   MARK_AS_ADVANCED(${var})
 endforeach()
 
- 
 add_executable(whole_image_to_local_glcm_algorithm test/whole_image_to_local_glcm_algorithm.cpp)
- 
+add_executable(GreyLevelCooccurrenceMatrix test/GreyLevelCooccurrenceMatrix.cpp)
+add_executable(filters test/filters.cpp)
+add_executable(image_to_features test/image_to_features.cpp)
+add_executable(ScalarImageToHaralickTextureFeaturesImage test/ScalarImageToHaralickTextureFeaturesImage.cpp)
+add_executable(ScalarImageToHaralickTextureFeatures_loop test/ScalarImageToHaralickTextureFeatures_loop.cpp)
+add_executable(ScalarImageToHaralickTextureFeaturesImage_statistics test/ScalarImageToHaralickTextureFeaturesImage_statistics.cpp)
+add_executable(GLCMImageCalculator test/GLCMImageCalculator.cpp)
+
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(whole_image_to_local_glcm_algorithm ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(GreyLevelCooccurrenceMatrix ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(filters ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(image_to_features ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(GLCMImageCalculator ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(whole_image_to_local_glcm_algorithm ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(GreyLevelCooccurrenceMatrix test/GreyLevelCooccurrenceMatrix.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(GreyLevelCooccurrenceMatrix ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(GreyLevelCooccurrenceMatrix ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(filters test/filters.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(filters ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(filters ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(image_to_features test/image_to_features.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(image_to_features ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(image_to_features ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(ScalarImageToHaralickTextureFeaturesImage test/ScalarImageToHaralickTextureFeaturesImage.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeaturesImage ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(ScalarImageToHaralickTextureFeatures_loop test/ScalarImageToHaralickTextureFeatures_loop.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ${ITK_LIBRARIES})
-endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
-add_executable(ScalarImageToHaralickTextureFeaturesImage_statistics test/ScalarImageToHaralickTextureFeaturesImage_statistics.cpp)
- 
-if( "${ITK_VERSION_MAJOR}" LESS 4 )
-  target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ITKReview ${ITK_LIBRARIES})
-else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ${ITK_LIBRARIES})
+  target_link_libraries(GLCMImageCalculator ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
-
 
 INSTALL( FILES
     include/itkGreyLevelCooccurrenceMatrix.h
@@ -98,6 +69,8 @@ INSTALL( FILES
     include/itkScalarImageToGreyLevelCooccurrenceMatrixFilter.hxx
     include/itkScalarImageToLocalHaralickTextureFeaturesFilter.h
     include/itkScalarImageToHaralickTextureFeaturesImageFilter.h
+	include/itkGLCMImageCalculator.h
+	include/itkGLCMImageCalculator.hxx
     DESTINATION "${INSTALL_DIR_INCLUDE}")
 
 
