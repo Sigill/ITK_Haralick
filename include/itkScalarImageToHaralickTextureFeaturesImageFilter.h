@@ -1,46 +1,50 @@
 #ifndef __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 #define __itkScalarImageToHaralickTextureFeaturesImageFilter_h
 
-#include "itkScalarImageToLocalHaralickTextureFeaturesFilter.h"
+#include "itkImageToImageFilter.h"
+#include "itkVectorImage.h"
+#include "itkGreyLevelCooccurrenceMatrix.h"
 #include "itkImageRegionIteratorWithIndex.h"
+#include "itkGLCMImageCalculator.h"
+#include "itkHaralickFeaturesGLCMCalculator.h"
 
 namespace itk
 {
 namespace Statistics
 {
 
-template< class TInputImageType, class TFeatureType >
+template< typename TInputImageType, typename TFeatureType >
 class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
-  public ImageToImageFilter< TInputImageType, Image< FixedArray< TFeatureType, 8 >, ::itk::GetImageDimension< TInputImageType >::ImageDimension > >
+  public ImageToImageFilter< TInputImageType, VectorImage< TFeatureType, ::itk::GetImageDimension< TInputImageType >::ImageDimension> >
 {
 public:
-  /** Standard typedefs */
-  typedef ScalarImageToHaralickTextureFeaturesImageFilter   Self;
-  typedef TInputImageType                                   InputImageType;
-  typedef TFeatureType                                      FeatureType;
-  typedef FixedArray< TFeatureType, 8 >                     OutputPixelType;
+  typedef TInputImageType                                                                        InputImageType;
+  typedef TFeatureType                                                                           FeatureType;
+  typedef VariableLengthVector< FeatureType >                                                    OutputPixelType;
+  typedef VectorImage< TFeatureType, ::itk::GetImageDimension< InputImageType >::ImageDimension> OutputImageType;
+
+  typedef ScalarImageToHaralickTextureFeaturesImageFilter       Self;
+  typedef ImageToImageFilter< InputImageType, OutputImageType > Superclass;
+  typedef SmartPointer< Self >                                  Pointer;
+  typedef SmartPointer< const Self >                            ConstPointer;
 
   itkStaticConstMacro(ImageDimension, unsigned int, ::itk::GetImageDimension< InputImageType >::ImageDimension);
 
-  typedef Image< OutputPixelType, itkGetStaticConstMacro(ImageDimension) >   OutputImageType;
-
-  typedef ImageToImageFilter< InputImageType, OutputImageType >   Superclass;
-  typedef SmartPointer< Self >                                    Pointer;
-  typedef SmartPointer< const Self >                              ConstPointer;
+  typedef Statistics::GreyLevelCooccurrenceMatrix< unsigned short > GLCMType;
+  typedef GLCMImageCalculator< InputImageType, GLCMType >           GLCMCalculatorType;
+  typedef HaralickFeaturesGLCMCalculator < GLCMType, float >       FeaturesCalculatorType;
 
   typedef typename InputImageType::PixelType    InputPixelType;
   typedef ::itk::Size< itkGetStaticConstMacro(ImageDimension) >    RadiusType;
 
-  typedef ScalarImageToLocalHaralickTextureFeaturesFilter< InputImageType, FeatureType > LocalHaralickComputer;
-
-  typedef typename LocalHaralickComputer::OffsetType         OffsetType;
-  typedef typename LocalHaralickComputer::OffsetVectorType   OffsetVectorType;
+  typedef typename GLCMCalculatorType::OffsetType         OffsetType;
+  typedef typename GLCMCalculatorType::OffsetVector OffsetVectorType;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ScalarImageToHaralickTextureFeaturesImageFilter, ImageToImageFilter);
+  itkTypeMacro(ScalarImageToHaralickTextureFeaturesImageFilter, ImageToImageFilter)
 
   /** standard New() method support */
-  itkNewMacro(Self);
+  itkNewMacro(Self)
 
   ScalarImageToHaralickTextureFeaturesImageFilter()
   {
@@ -52,9 +56,10 @@ public:
     defaultRadius[0] = 1;
     this->m_WindowRadius = defaultRadius;
 
-    this->m_LocalHaralickComputer = LocalHaralickComputer::New();
+    this->m_GLCMCalculator = GLCMCalculatorType::New();
+    this->m_FeaturesCalculator = FeaturesCalculatorType::New();
 
-    //this->ProcessObject::SetOutput(this->MakeOutput
+	this->m_FeaturesCalculator->SetCooccurrenceMatrix(this->m_GLCMCalculator->GetCooccurrenceMatrix());
   }
 
   virtual void GenerateInputRequestedRegion() throw( InvalidRequestedRegionError )
@@ -100,8 +105,8 @@ public:
     // the output itk::VectorImage
     this->Superclass::GenerateOutputInformation();
 
-    //OutputImageType *output = this->GetOutput();
-    //output->SetNumberOfComponentsPerPixel( 8 );
+    OutputImageType *output = this->GetOutput();
+    output->SetNumberOfComponentsPerPixel( 8 );
   }
 
   void SetInput(const InputImageType *image)
@@ -114,28 +119,27 @@ public:
 
   inline void SetOffset(const OffsetType offset)
   {
-    this->m_LocalHaralickComputer->SetOffset(offset);
+    this->m_GLCMCalculator->SetOffset(offset);
   }
 
   inline void SetOffsets(const OffsetVectorType * offsets)
   {
-    this->m_LocalHaralickComputer->SetOffsets(offsets);
+    this->m_GLCMCalculator->SetOffsets(offsets);
   }
 
   inline const OffsetVectorType* GetOffsets()
   {
-    return this->m_LocalHaralickComputer->GetOffsets();
+    return this->m_GLCMCalculator->GetOffsets();
   }
-
 
   inline void SetNumberOfBinsPerAxis(const unsigned char size)
   {
-    this->m_LocalHaralickComputer->SetNumberOfBinsPerAxis(size);
+    this->m_GLCMCalculator->SetMatrixSize(size);
   }
 
   inline const unsigned char GetNumberOfBinsPerAxis()
   {
-    return this->m_LocalHaralickComputer->GetNumberOfBinsPerAxis();
+    return this->m_GLCMCalculator->GetMatrixSize();
   }
 
   void GenerateData(void)
@@ -144,7 +148,7 @@ public:
     const InputImageType *input = this->GetInput();
     OutputImageType *output = this->GetOutput();
 
-    this->m_LocalHaralickComputer->SetInput(input);
+    this->m_GLCMCalculator->SetImage(input);
 
     typename InputImageType::RegionType windowRegion, requestedRegion = output->GetRequestedRegion();
     typename InputImageType::IndexType windowIndex;
@@ -155,11 +159,6 @@ public:
       windowSize.SetElement(i, (m_WindowRadius.GetElement(i) << 1) + 1);
       }
 
-    /*
-    typedef itk::VariableLengthVector<double> VariableVectorType;
-    VariableVectorType features;
-    features.SetSize(8);
-    */
     OutputPixelType features;
 
     output->SetBufferedRegion( output->GetRequestedRegion() );
@@ -179,20 +178,12 @@ public:
       windowRegion.Crop(requestedRegion);
 
       itkDebugMacro( << "Processing Region: " << std::endl << windowRegion);
+	  this->m_GLCMCalculator->ResetMatrix();
+      this->m_GLCMCalculator->SetRegion(windowRegion);
+	  this->m_GLCMCalculator->Compute();
+      this->m_FeaturesCalculator->Compute();
 
-      this->m_LocalHaralickComputer->SetRegionOfInterest(windowRegion);
-      this->m_LocalHaralickComputer->Update();
-
-      features[0] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::Energy);
-      features[1] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::Entropy);
-      features[2] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::Correlation);
-      features[3] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::InverseDifferenceMoment);
-      features[4] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::Inertia);
-      features[5] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::ClusterShade);
-      features[6] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::ClusterProminence);
-      features[7] = this->m_LocalHaralickComputer->GetFeature(LocalHaralickComputer::HaralickFeaturesComputer::HaralickCorrelation);
-
-      outputIterator.Set(features);
+      outputIterator.Set(this->m_FeaturesCalculator->GetFeatures());
 
       ++imageIterator;
       ++outputIterator;
@@ -200,9 +191,9 @@ public:
   }
 
 private:
-  typename LocalHaralickComputer::Pointer m_LocalHaralickComputer;
   RadiusType m_WindowRadius;
-  
+  typename GLCMCalculatorType::Pointer m_GLCMCalculator;
+  typename FeaturesCalculatorType::Pointer  m_FeaturesCalculator;
 };
 
 } // End of namespace Statistics

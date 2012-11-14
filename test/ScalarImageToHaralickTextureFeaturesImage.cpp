@@ -12,12 +12,12 @@ const unsigned int D = 2;
 
 typedef itk::Image<unsigned char, D> ImageType;
 typedef itk::ImageRegionIteratorWithIndex< ImageType > ImageIterator;
-typedef typename itk::Statistics::ScalarImageToHaralickTextureFeaturesImageFilter< ImageType, double  > ScalarImageToHaralickTextureFeaturesImageFilter;
+typedef typename itk::Statistics::ScalarImageToHaralickTextureFeaturesImageFilter< ImageType, double > ScalarImageToHaralickTextureFeaturesImageFilter;
 typedef typename ScalarImageToHaralickTextureFeaturesImageFilter::OutputImageType HaralickImageType;
 
 int main(int argc, char **argv)
 {
-  /*
+	/*
   ImageType::Pointer image = ImageType::New();
 
   ImageType::RegionType region;
@@ -39,10 +39,11 @@ int main(int argc, char **argv)
     for (imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
     {
       ind = imageIt.GetIndex();
-      imageIt.Set(ind[1] % 2 + 1);
+      imageIt.Set((ind[1] % 2)*3);
     }
   }
   */
+	
   typedef itk::ImageFileReader<ImageType> ReaderType;
 
   ReaderType::Pointer reader = ReaderType::New();
@@ -54,13 +55,13 @@ int main(int argc, char **argv)
   typename RescaleFilter::Pointer rescaler = RescaleFilter::New();
   rescaler->SetInput(reader->GetOutput());
   rescaler->SetOutputMinimum(0);
-  rescaler->SetOutputMaximum(4);
+  rescaler->SetOutputMaximum(7);
 
   typename ScalarImageToHaralickTextureFeaturesImageFilter::Pointer haralickComputer = ScalarImageToHaralickTextureFeaturesImageFilter::New();
   typename ScalarImageToHaralickTextureFeaturesImageFilter::RadiusType windowRadius; windowRadius.Fill(3);
   haralickComputer->SetInput(rescaler->GetOutput());
   haralickComputer->SetWindowRadius(windowRadius);
-  haralickComputer->SetNumberOfBinsPerAxis(4);
+  haralickComputer->SetNumberOfBinsPerAxis(8);
 
   typename ScalarImageToHaralickTextureFeaturesImageFilter::OffsetType offset1 = {{0, 1}};
   typename ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::Pointer offsetV = ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::New();
@@ -69,9 +70,10 @@ int main(int argc, char **argv)
 
   haralickComputer->Update();
 
+  /*
   typename HaralickImageType::PixelType pixel;
   typename HaralickImageType::IndexType index;
-  itk::ImageRegionIteratorWithIndex< HaralickImageType > outputIterator(haralickComputer->GetOutput(),haralickComputer->GetOutput()->GetRequestedRegion());
+  itk::ImageRegionIteratorWithIndex< HaralickImageType > outputIterator(haralickComputer->GetOutput(), haralickComputer->GetOutput()->GetRequestedRegion());
   outputIterator.GoToBegin();
   while(!outputIterator.IsAtEnd())
   {
@@ -80,6 +82,7 @@ int main(int argc, char **argv)
     std::cout << index << pixel << std::endl;
     ++outputIterator;
   }
+  */
 
   return 0;
 }

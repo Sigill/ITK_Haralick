@@ -71,6 +71,8 @@ INSTALL( FILES
     include/itkScalarImageToHaralickTextureFeaturesImageFilter.h
 	include/itkGLCMImageCalculator.h
 	include/itkGLCMImageCalculator.hxx
+	include/itkHaralickFeaturesGLCMCalculator.h
+	include/itkHaralickFeaturesGLCMCalculator.hxx
     DESTINATION "${INSTALL_DIR_INCLUDE}")
 
 

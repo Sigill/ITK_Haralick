@@ -50,6 +50,8 @@ public:
 
   void SetRegion(const RegionType & region);
 
+  void ResetMatrix(void);
+
   itkGetConstObjectMacro(Offsets, OffsetVector)
   void SetOffsets(const OffsetVector * os);
   void SetOffset(const OffsetType o);

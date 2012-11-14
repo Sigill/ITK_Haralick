@@ -38,7 +38,7 @@ int main(int argc, char **argv)
   ImageRescaler::Pointer rescaler = ImageRescaler::New();
   rescaler->SetInput(reader->GetOutput());
   rescaler->SetOutputMinimum(0);
-  rescaler->SetOutputMaximum(PosterizationLevel);
+  rescaler->SetOutputMaximum(PosterizationLevel - 1);
 
   ScalarImageToHaralickTextureFeaturesImageFilter::Pointer haralickComputer = ScalarImageToHaralickTextureFeaturesImageFilter::New();
   ScalarImageToHaralickTextureFeaturesImageFilter::RadiusType windowRadius; windowRadius.Fill(3);

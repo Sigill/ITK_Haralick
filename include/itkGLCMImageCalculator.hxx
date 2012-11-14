@@ -92,6 +92,14 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 template< typename TInputImage, typename TGLCMType >
 void
 GLCMImageCalculator< TInputImage, TGLCMType >
+::ResetMatrix()
+{
+	m_CooccurrenceMatrix->SetToZero();
+}
+
+template< typename TInputImage, typename TGLCMType >
+void
+GLCMImageCalculator< TInputImage, TGLCMType >
 ::SetOffsets(const OffsetVector * os)
 {
   itkDebugMacro("setting offsets to " << os);

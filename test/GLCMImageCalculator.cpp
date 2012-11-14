@@ -32,6 +32,8 @@ int main(int argc, char** argv)
   Image2DType::OffsetType offset1 = {{0, 1}};
   calculator->SetOffset(offset1);
 
+  calculator->DebugOn();
+
   calculator->SetRegion(image->GetLargestPossibleRegion());
 
   calculator->Compute();
