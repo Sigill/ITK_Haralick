@@ -15,20 +15,20 @@ namespace Statistics
 
 template< typename TInputImageType, typename TFeatureType >
 class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
-  public ImageToImageFilter< TInputImageType, VectorImage< TFeatureType, ::itk::GetImageDimension< TInputImageType >::ImageDimension> >
+  public ImageToImageFilter< TInputImageType, VectorImage< TFeatureType, TInputImageType::ImageDimension> >
 {
 public:
   typedef TInputImageType                                                                        InputImageType;
   typedef TFeatureType                                                                           FeatureType;
   typedef VariableLengthVector< FeatureType >                                                    OutputPixelType;
-  typedef VectorImage< TFeatureType, ::itk::GetImageDimension< InputImageType >::ImageDimension> OutputImageType;
+  typedef VectorImage< TFeatureType, InputImageType::ImageDimension> OutputImageType;
 
   typedef ScalarImageToHaralickTextureFeaturesImageFilter       Self;
   typedef ImageToImageFilter< InputImageType, OutputImageType > Superclass;
   typedef SmartPointer< Self >                                  Pointer;
   typedef SmartPointer< const Self >                            ConstPointer;
 
-  itkStaticConstMacro(ImageDimension, unsigned int, ::itk::GetImageDimension< InputImageType >::ImageDimension);
+  itkStaticConstMacro(ImageDimension, unsigned int, InputImageType::ImageDimension);
 
   typedef Statistics::GreyLevelCooccurrenceMatrix< unsigned short > GLCMType;
   typedef GLCMImageCalculator< InputImageType, GLCMType >           GLCMCalculatorType;

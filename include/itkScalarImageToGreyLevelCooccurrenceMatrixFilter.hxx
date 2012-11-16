@@ -275,7 +275,7 @@ ScalarImageToGreyLevelCooccurrenceMatrixFilter< TImageType >::ComputeOffsetsMinR
 
   for ( off_it = m_Offsets->Begin(); off_it != m_Offsets->End(); off_it++ )
   {
-    for ( i = 0; i < ::itk::GetImageDimension< ImageType >::ImageDimension; i++ )
+    for ( i = 0; i < ImageType::ImageDimension; i++ )
     {
       distance = vnl_math_abs(off_it.Value()[i]);
       if ( distance > m_OffsetsMinRadius[i] )
