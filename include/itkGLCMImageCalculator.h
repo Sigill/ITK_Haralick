@@ -24,7 +24,6 @@ public:
   typedef typename ImageType::PixelType                PixelType;
   typedef typename ImageType::IndexType                IndexType;
   typedef typename ImageType::RegionType               RegionType;
-  typedef typename ImageType::SizeType                 RadiusType;
 
   typedef TGLCMType                                    GLCMType;
   typedef typename GLCMType::Pointer                   GLCMPointer;
@@ -65,15 +64,12 @@ private:
   GLCMImageCalculator(const Self &); //purposely not implemented
   void operator=(const Self &); //purposely not implemented
 
-  void ComputeOffsetsMinRadius(void);
-
   ImageConstPointer m_Image;
 
   GLCMPointer m_CooccurrenceMatrix;
   GLCMSizeType m_MatrixSize;
 
   OffsetVectorConstPointer m_Offsets;
-  RadiusType m_OffsetsMinRadius;
 
   RegionType m_Region;
   bool       m_RegionSetByUser;

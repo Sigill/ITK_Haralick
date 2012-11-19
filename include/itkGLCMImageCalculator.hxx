@@ -94,7 +94,7 @@ void
 GLCMImageCalculator< TInputImage, TGLCMType >
 ::ResetMatrix()
 {
-	m_CooccurrenceMatrix->SetToZero();
+  m_CooccurrenceMatrix->SetToZero();
 }
 
 template< typename TInputImage, typename TGLCMType >
@@ -104,7 +104,6 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 {
   itkDebugMacro("setting offsets to " << os);
   this->m_Offsets = os;
-  this->ComputeOffsetsMinRadius();
   this->Modified();
 }
 
@@ -117,32 +116,8 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 
   offsetVector->push_back(offset);
   this->SetOffsets(offsetVector);
-  this->ComputeOffsetsMinRadius();
 
   this->Modified();
-}
-
-template< typename TInputImage, typename TGLCMType >
-void
-GLCMImageCalculator< TInputImage, TGLCMType >
-::ComputeOffsetsMinRadius(void)
-{
-  unsigned int distance, i;
-  typename OffsetVector::ConstIterator off_it;
-
-  m_OffsetsMinRadius.Fill(0);
-
-  for ( off_it = m_Offsets->Begin(); off_it != m_Offsets->End(); off_it++ )
-  {
-    for ( i = 0; i < ImageType::ImageDimension; i++ )
-    {
-      distance = vnl_math_abs(off_it.Value()[i]);
-      if ( distance > m_OffsetsMinRadius[i] )
-      {
-        m_OffsetsMinRadius[i] = distance;
-      }
-    }
-  }
 }
 
 template< typename TInputImage, typename TGLCMType >
