@@ -7,6 +7,22 @@
 
 namespace itk
 {
+namespace Statistics
+{
+
+/**
+ * \class HaralickFeaturesGLCMCalculator
+ * \brief Used to compute Haralick texture features from a 
+ * cooccurrence matrix.
+ *
+ * GLCMImageCalculator is templated over the type of cooccurrence
+ * matrix and the type of the features computed (floating point).
+ *
+ * The algorithm return a VariableLenggthVector containing 
+ * the following features: energy, entropy, correlation, inverse 
+ * difference moment, inertia, cluster shade, cluster prominence
+ * and haralick correlation.
+ */
 template< typename TGLCMType, typename TFeatureType >
 class ITK_EXPORT HaralickFeaturesGLCMCalculator : public Object
 {
@@ -38,18 +54,10 @@ public:
 
   void Compute(void);
 
-  /** Texture feature types */
-  typedef enum {
-    Energy,
-    Entropy,
-    Correlation,
-    InverseDifferenceMoment,
-    Inertia,
-    ClusterShade,
-    ClusterProminence,
-    HaralickCorrelation,
-    InvalidFeatureName
-    } TextureFeatureName;
+#ifdef ITK_USE_CONCEPT_CHECKING
+  itkConceptMacro( FeatureTypeIsFloatingPointCheck,
+    ( Concept::IsFloatingPoint< FeatureType > ) );
+#endif
 
 protected:
   HaralickFeaturesGLCMCalculator();
@@ -67,6 +75,7 @@ private:
 
   FeaturesVectorType m_Features;
 };
+} // end namespace Statistics
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

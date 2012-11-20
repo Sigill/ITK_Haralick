@@ -1,8 +1,7 @@
-#ifndef __itkGreyLevelCooccurrenceMatrix_h
-#define __itkGreyLevelCooccurrenceMatrix_h
+#ifndef ITKGREYLEVELCOOCCURRENCEMATRIX_H
+#define ITKGREYLEVELCOOCCURRENCEMATRIX_H
 
 #include <vector>
-#include <iomanip>
 
 #include "itkMacro.h"
 #include "itkObjectFactory.h"
@@ -16,40 +15,44 @@ namespace itk
 namespace Statistics
 {
 
-/** \class GreyLevelCooccurrenceMatrix
- *  \brief This class is used to count coocurrence of two grey levels.
+/**
+ * \class GreyLevelCooccurrenceMatrix
+ * \brief This class is used to count coocurrence of two grey levels
+ * in a region of an image.
  *
- * A cooccurrence matrix can be seen as a 2-dimensional histogram where each 
+ * The class is templated over the type of measurements.
+ *
+ * A cooccurrence matrix can be seen as a 2-dimensional histogram where each
  * dimension represent the occurrence of grey level.
  *
  * Grey levels are represented by their value, from 0 to N-1, where N is the
  * size of the matrix.
  **/
 
-template< class TMeasurementType = unsigned int > 
+template< class TMeasurementType = unsigned int >
 class GreyLevelCooccurrenceMatrix:private std::vector<TMeasurementType>, public DataObject
 {
 public:
 
   /** Standard class typedefs */
-  typedef GreyLevelCooccurrenceMatrix         Self;
-  typedef DataObject                 Superclass;
-  typedef SmartPointer< Self >       Pointer;
-  typedef SmartPointer< const Self > ConstPointer;
+  typedef GreyLevelCooccurrenceMatrix Self;
+  typedef DataObject                  Superclass;
+  typedef SmartPointer< Self >        Pointer;
+  typedef SmartPointer< const Self >  ConstPointer;
 
   /** Run-time type information (and related methods) */
   itkTypeMacro(GreyLevelCooccurrenceMatrix, DataObject);
 
-  typedef TMeasurementType MeasurementType;
-  typedef std::vector<MeasurementType> CounterContainer;
-  typedef unsigned int SizeType;
-  typedef SizeType IndexType;
-  typedef typename CounterContainer::iterator Iterator;
+  typedef TMeasurementType                          MeasurementType;
+  typedef std::vector<MeasurementType>              CounterContainer;
+  typedef unsigned int                              SizeType;
+  typedef SizeType                                  IndexType;
+  typedef typename CounterContainer::iterator       Iterator;
   typedef typename CounterContainer::const_iterator ConstIterator;
 
 #ifdef ITK_USE_CONCEPT_CHECKING
-  itkConceptMacro( InputHasNumericTraitsCheck,
-      ( Concept::HasNumericTraits< MeasurementType > ) );
+  itkConceptMacro( MeasurementHasNumericTraitsCheck,
+    ( Concept::HasNumericTraits< MeasurementType > ) );
 #endif
 
   GreyLevelCooccurrenceMatrix()
@@ -62,16 +65,7 @@ public:
 
   /** Resizes the matrix to the specified size (only if necessary)
    * and set every measures to 0. */
-  void SetSize(const SizeType size)
-  {
-    itkDebugMacro(<< "Resizing the GreyLevelCooccurrenceMatrix to " << size << ".");
-    if(m_Size != size)
-      {
-      m_Size = size;
-      CounterContainer::resize(m_Size * m_Size);
-      }
-    this->SetToZero();
-  }
+  void SetSize(const SizeType size);
 
   inline unsigned int GetSize(void) const
   {
@@ -125,24 +119,7 @@ public:
     *v2 = index / m_Size;
   }
 
-  void PrintSelf(std::ostream & os, Indent indent) const
-  {
-    Superclass::PrintSelf(os, indent);
-    os << indent << "Size: " << this->GetSize() << std::endl;
-    os << indent << "TotalCount: " << this->GetTotalCount() << std::endl;
-    os << indent << "Values: " << std::endl;
-
-    ConstIterator it = this->Begin(), begin = this->Begin(), end = this->End();
-
-    IndexType i1, i2;
-    while(it != end)
-    {
-      GetIndexes(it - begin, &i1, &i2);
-      os << indent.GetNextIndent() << "(" << std::setw(4) << setiosflags(std::ios::left) << i1 << "; " 
-        << std::setw(4) << setiosflags(std::ios::left) << i2 << "): " << (*it) << std::endl;
-      ++it;
-    }
-  }
+  void PrintSelf(std::ostream & os, Indent indent) const;
 
 private:
   IndexType m_Size;
@@ -162,5 +139,5 @@ private:
 #include "itkGreyLevelCooccurrenceMatrix.hxx"
 #endif
 
-#endif /* __itkGreyLevelCooccurrenceMatrix_h */
+#endif /* ITKGREYLEVELCOOCCURRENCEMATRIX_H */
 

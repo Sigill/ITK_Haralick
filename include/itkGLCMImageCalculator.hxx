@@ -7,6 +7,9 @@
 
 namespace itk
 {
+namespace Statistics
+{
+
 template< typename TInputImage, typename TGLCMType >
 GLCMImageCalculator< TInputImage, TGLCMType >
 ::GLCMImageCalculator():
@@ -21,13 +24,18 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 ::Compute(void)
 {
   if(m_MatrixSize != m_CooccurrenceMatrix->GetSize())
-  {
+    {
     this->m_CooccurrenceMatrix->SetSize(m_MatrixSize);
-  }
+    }
 
   if ( !m_RegionSetByUser )
     {
     m_Region = m_Image->GetRequestedRegion();
+    }
+
+  if(!m_Image->GetBufferedRegion().IsInside(m_Region))
+    {
+     itkExceptionMacro( << "The requested region is outside of the buffered region" );
     }
 
   itkDebugMacro( << "Processing region: " << m_Region );
@@ -35,7 +43,7 @@ GLCMImageCalculator< TInputImage, TGLCMType >
   itk::ImageRegionConstIteratorWithIndex< ImageType > iterator(m_Image, m_Region);
   PixelType centerPixelIntensity, offsetPixelIntensity;
   typename ImageType::IndexType centerPixelIndex, offsetPixelIndex;
-  typename OffsetVector::ConstIterator off_it, off_it_begin = m_Offsets->Begin(), off_it_end = m_Offsets->End();
+  typename OffsetVectorType::ConstIterator off_it, off_it_begin = m_Offsets->Begin(), off_it_end = m_Offsets->End();
 
   iterator.GoToBegin();
   while(!iterator.IsAtEnd())
@@ -100,7 +108,7 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 template< typename TInputImage, typename TGLCMType >
 void
 GLCMImageCalculator< TInputImage, TGLCMType >
-::SetOffsets(const OffsetVector * os)
+::SetOffsets(const OffsetVectorType * os)
 {
   itkDebugMacro("setting offsets to " << os);
   this->m_Offsets = os;
@@ -112,7 +120,7 @@ void
 GLCMImageCalculator< TInputImage, TGLCMType >
 ::SetOffset(const OffsetType offset)
 {
-  OffsetVectorPointer offsetVector = OffsetVector::New();
+  OffsetVectorPointer offsetVector = OffsetVectorType::New();
 
   offsetVector->push_back(offset);
   this->SetOffsets(offsetVector);
@@ -133,6 +141,8 @@ GLCMImageCalculator< TInputImage, TGLCMType >
   m_Region.Print( os, indent.GetNextIndent() );
   os << indent << "Region set by User: " << m_RegionSetByUser << std::endl;
 }
+
+} // end namespace Statistics
 } // end namespace itk
 
 #endif /* ITKGLCMIMAGECALCULATOR_HXX */

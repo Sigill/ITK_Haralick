@@ -38,6 +38,7 @@ add_executable(ScalarImageToHaralickTextureFeaturesImage test/ScalarImageToHaral
 add_executable(ScalarImageToHaralickTextureFeatures_loop test/ScalarImageToHaralickTextureFeatures_loop.cpp)
 add_executable(ScalarImageToHaralickTextureFeaturesImage_statistics test/ScalarImageToHaralickTextureFeaturesImage_statistics.cpp)
 add_executable(GLCMImageCalculator test/GLCMImageCalculator.cpp)
+add_executable(HaralickFeaturesGLCMCalculator test/HaralickFeaturesGLCMCalculator.cpp)
 
 if( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(whole_image_to_local_glcm_algorithm ITKReview ${ITK_LIBRARIES})
@@ -48,6 +49,7 @@ if( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ITKReview ${ITK_LIBRARIES})
   target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ITKReview ${ITK_LIBRARIES})
   target_link_libraries(GLCMImageCalculator ITKReview ${ITK_LIBRARIES})
+  target_link_libraries(HaralickFeaturesGLCMCalculator ITKReview ${ITK_LIBRARIES})
 else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(whole_image_to_local_glcm_algorithm ${ITK_LIBRARIES})
   target_link_libraries(GreyLevelCooccurrenceMatrix ${ITK_LIBRARIES})
@@ -57,6 +59,7 @@ else( "${ITK_VERSION_MAJOR}" LESS 4 )
   target_link_libraries(ScalarImageToHaralickTextureFeatures_loop ${ITK_LIBRARIES})
   target_link_libraries(ScalarImageToHaralickTextureFeaturesImage_statistics ${ITK_LIBRARIES})
   target_link_libraries(GLCMImageCalculator ${ITK_LIBRARIES})
+  target_link_libraries(HaralickFeaturesGLCMCalculator ${ITK_LIBRARIES})
 endif( "${ITK_VERSION_MAJOR}" LESS 4 )
 
 INSTALL( FILES

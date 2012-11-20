@@ -13,32 +13,47 @@ namespace itk
 namespace Statistics
 {
 
+/**
+ * \class ScalarImageToHaralickTextureFeaturesImageFilter
+ * \brief Filter used to compute local Haralick features from an image
+ * and returns it as a VectorImage of the features.
+ *
+ * The class is templated over the type of input image (must be a fixed
+ * point scalar image whose pixel range goes from 0 to an user defined
+ * number of grey-levels to consider), and the type of features expected
+ * (floating point type).
+ */
 template< typename TInputImageType, typename TFeatureType >
 class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
   public ImageToImageFilter< TInputImageType, VectorImage< TFeatureType, TInputImageType::ImageDimension> >
 {
 public:
-  typedef TInputImageType                                                                        InputImageType;
-  typedef TFeatureType                                                                           FeatureType;
-  typedef VariableLengthVector< FeatureType >                                                    OutputPixelType;
+  typedef TInputImageType                                            InputImageType;
+  typedef TFeatureType                                               FeatureType;
+  typedef VariableLengthVector< FeatureType >                        OutputPixelType;
   typedef VectorImage< TFeatureType, InputImageType::ImageDimension> OutputImageType;
 
-  typedef ScalarImageToHaralickTextureFeaturesImageFilter       Self;
-  typedef ImageToImageFilter< InputImageType, OutputImageType > Superclass;
-  typedef SmartPointer< Self >                                  Pointer;
-  typedef SmartPointer< const Self >                            ConstPointer;
+  typedef ScalarImageToHaralickTextureFeaturesImageFilter            Self;
+  typedef ImageToImageFilter< InputImageType, OutputImageType >      Superclass;
+  typedef SmartPointer< Self >                                       Pointer;
+  typedef SmartPointer< const Self >                                 ConstPointer;
 
   itkStaticConstMacro(ImageDimension, unsigned int, InputImageType::ImageDimension);
 
-  typedef Statistics::GreyLevelCooccurrenceMatrix< unsigned short > GLCMType;
-  typedef GLCMImageCalculator< InputImageType, GLCMType >           GLCMCalculatorType;
-  typedef HaralickFeaturesGLCMCalculator < GLCMType, float >       FeaturesCalculatorType;
+  typedef Statistics::GreyLevelCooccurrenceMatrix< unsigned short >  GLCMType;
+  typedef GLCMImageCalculator< InputImageType, GLCMType >            GLCMCalculatorType;
+  typedef HaralickFeaturesGLCMCalculator < GLCMType, float >         FeaturesCalculatorType;
 
-  typedef typename InputImageType::PixelType    InputPixelType;
-  typedef ::itk::Size< itkGetStaticConstMacro(ImageDimension) >    RadiusType;
+  typedef typename InputImageType::PixelType                         InputPixelType;
+  typedef ::itk::Size< itkGetStaticConstMacro(ImageDimension) >      RadiusType;
 
-  typedef typename GLCMCalculatorType::OffsetType         OffsetType;
-  typedef typename GLCMCalculatorType::OffsetVector OffsetVectorType;
+  typedef typename GLCMCalculatorType::OffsetType                    OffsetType;
+  typedef typename GLCMCalculatorType::OffsetVectorType              OffsetVectorType;
+
+#ifdef ITK_USE_CONCEPT_CHECKING
+  itkConceptMacro( FeatureTypeIsFloatingPointCheck,
+    ( Concept::IsFloatingPoint< FeatureType > ) );
+#endif
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(ScalarImageToHaralickTextureFeaturesImageFilter, ImageToImageFilter)
@@ -50,11 +65,6 @@ public:
   {
     this->SetNumberOfRequiredInputs(1);
     this->SetNumberOfRequiredOutputs(1);
-
-    RadiusType defaultRadius;
-    defaultRadius.Fill(0);
-    defaultRadius[0] = 1;
-    this->m_WindowRadius = defaultRadius;
 
     this->m_GLCMCalculator = GLCMCalculatorType::New();
     this->m_FeaturesCalculator = FeaturesCalculatorType::New();
@@ -191,9 +201,9 @@ public:
   }
 
 private:
-  RadiusType m_WindowRadius;
-  typename GLCMCalculatorType::Pointer m_GLCMCalculator;
-  typename FeaturesCalculatorType::Pointer  m_FeaturesCalculator;
+  RadiusType                               m_WindowRadius;
+  typename GLCMCalculatorType::Pointer     m_GLCMCalculator;
+  typename FeaturesCalculatorType::Pointer m_FeaturesCalculator;
 };
 
 } // End of namespace Statistics

@@ -6,12 +6,14 @@
 
 namespace itk
 {
+namespace Statistics
+{
 
 template< typename TGLCMType, typename TFeatureType >
 HaralickFeaturesGLCMCalculator< TGLCMType, TFeatureType >
 ::HaralickFeaturesGLCMCalculator()
 {
-	m_Features.SetSize(8);
+  m_Features.SetSize(8);
 }
 
 template< typename TGLCMType, typename TFeatureType >
@@ -196,6 +198,7 @@ HaralickFeaturesGLCMCalculator< TGLCMType, TFeatureType >
   */
 }
 
+} // end namespace Statistics
 } // end namespace itk
 
 #endif /* ITKHARALICKFEATURESGLCMCALCULATOR_HXX */

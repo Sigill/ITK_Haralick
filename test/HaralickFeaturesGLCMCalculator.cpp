@@ -3,6 +3,7 @@
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkGLCMImageCalculator.h"
 #include "itkHaralickFeaturesGLCMCalculator.h"
+#include "itkImageFileWriter.h"
 
 #include <iostream>
 
@@ -17,6 +18,10 @@ typedef itk::Statistics::GreyLevelCooccurrenceMatrix< unsigned int > GLCMType;
 
 typedef itk::Statistics::GLCMImageCalculator< ImageType, GLCMType > GLCMImageCalculatorType;
 
+typedef itk::Statistics::HaralickFeaturesGLCMCalculator< GLCMType, double > FeaturesCalculatorType;
+
+typedef itk::ImageFileWriter<ImageType> WriterType;
+
 void CreateImage(ImageType::Pointer img);
 
 int main(int argc, char** argv)
@@ -26,26 +31,27 @@ int main(int argc, char** argv)
 
   GLCMImageCalculatorType::Pointer calculator = GLCMImageCalculatorType::New();
   calculator->SetImage(image);
-  calculator->SetMatrixSize(8);
+  calculator->SetMatrixSize(4);
 
   GLCMImageCalculatorType::OffsetVectorPointer offsets = GLCMImageCalculatorType::OffsetVectorType::New();
-  GLCMImageCalculatorType::OffsetType offset1 = {{0, 1}};
-  GLCMImageCalculatorType::OffsetType offset2 = {{1, 0}};
-  offsets->push_back(offset1);
+  //GLCMImageCalculatorType::OffsetType offset1 = {{0, 1}};
+  GLCMImageCalculatorType::OffsetType offset2 = {{0, 1}};
+  //offsets->push_back(offset1);
   offsets->push_back(offset2);
   calculator->SetOffsets(offsets);
 
-  //calculator->DebugOn();
-
   calculator->SetRegion(image->GetLargestPossibleRegion());
 
-  for(int i = 0; i < 1000; ++i)
-  {
-    calculator->ResetMatrix();
-    calculator->Compute();
-  }
+  calculator->Compute();
 
-  //calculator->GetCooccurrenceMatrix()->Print(std::cout);
+  calculator->GetCooccurrenceMatrix()->Print(std::cout);
+
+  FeaturesCalculatorType::Pointer featuresCalculator = FeaturesCalculatorType::New();
+  featuresCalculator->SetCooccurrenceMatrix(calculator->GetCooccurrenceMatrix());
+
+  featuresCalculator->Compute();
+
+  std::cout << featuresCalculator->GetFeatures() << std::endl;
 }
 
 void CreateImage(ImageType::Pointer image)
@@ -68,6 +74,15 @@ void CreateImage(ImageType::Pointer image)
   for (imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
   {
     ind = imageIt.GetIndex();
-    imageIt.Set(ind[1] % 2 + 1);
+	//if(ind[1] < (W/2))
+	//    imageIt.Set(ind[1] % 2);
+	//else
+	//    imageIt.Set(ind[0] % 2);
+	imageIt.Set(ind[1] % 2);
   }
+
+  typename WriterType::Pointer writer = WriterType::New();
+  writer->SetInput(image);
+  writer->SetFileName("out.bmp");
+  writer->Update();
 }
