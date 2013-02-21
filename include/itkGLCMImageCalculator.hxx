@@ -95,6 +95,8 @@ GLCMImageCalculator< TInputImage, TGLCMType >
 {
   m_Region = region;
   m_RegionSetByUser = true;
+
+  this->Modified();
 }
 
 template< typename TInputImage, typename TGLCMType >
