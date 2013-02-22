@@ -5,6 +5,7 @@
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkScalarImageToHaralickTextureFeaturesImageFilter.h"
 #include "itkVectorIndexSelectionCastImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkStatisticsImageFilter.h"
 #include <vector>
@@ -69,14 +70,16 @@ int main(int argc, char **argv)
   writer->SetInput(castFilter->GetOutput());
 
   std::vector< std::string > features_name;
-  features_name.push_back("energy");
-  features_name.push_back("entropy");
-  features_name.push_back("correlation");
+  features_name.push_back("angularSecondMoment");
+  features_name.push_back("contrast");
+  features_name.push_back("variance");
   features_name.push_back("inverse_difference_moment");
-  features_name.push_back("inertia");
-  features_name.push_back("cluster_shade");
-  features_name.push_back("cluster_prominence");
-  features_name.push_back("haralick_correlation");
+  features_name.push_back("sum_average");
+  features_name.push_back("sum_variance");
+  features_name.push_back("sum_entropy");
+  features_name.push_back("entropy");
+  features_name.push_back("differenceVariance");
+  features_name.push_back("differenceEntropy");
 
   std::vector< std::string >::const_iterator names_it = features_name.begin(), names_end = features_name.end();
   unsigned int i = 0;

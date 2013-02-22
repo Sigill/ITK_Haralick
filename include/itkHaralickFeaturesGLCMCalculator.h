@@ -52,6 +52,8 @@ public:
 
   itkGetConstReferenceMacro(Features, FeaturesVectorType)
 
+  itkStaticConstMacro(NumberOfFeatures, unsigned int, 10);
+
   void Compute(void);
 
 #ifdef ITK_USE_CONCEPT_CHECKING
@@ -63,9 +65,6 @@ protected:
   HaralickFeaturesGLCMCalculator();
   virtual ~HaralickFeaturesGLCMCalculator() {}
   void PrintSelf(std::ostream & os, Indent indent) const;
-
-  void ComputeMeansAndVariances(FeatureType & pixelMean, FeatureType & marginalMean,
-                                FeatureType & marginalDevSquared, FeatureType & pixelVariance);
 
 private:
   HaralickFeaturesGLCMCalculator(const Self &); //purposely not implemented

@@ -116,7 +116,7 @@ public:
     this->Superclass::GenerateOutputInformation();
 
     OutputImageType *output = this->GetOutput();
-    output->SetNumberOfComponentsPerPixel( 8 );
+    output->SetNumberOfComponentsPerPixel( FeaturesCalculatorType::NumberOfFeatures );
   }
 
   void SetInput(const InputImageType *image)
@@ -188,9 +188,9 @@ public:
       windowRegion.Crop(requestedRegion);
 
       itkDebugMacro( << "Processing Region: " << std::endl << windowRegion);
-	  this->m_GLCMCalculator->ResetMatrix();
+      this->m_GLCMCalculator->ResetMatrix();
       this->m_GLCMCalculator->SetRegion(windowRegion);
-	  this->m_GLCMCalculator->Compute();
+      this->m_GLCMCalculator->Compute();
       this->m_FeaturesCalculator->Compute();
 
       outputIterator.Set(this->m_FeaturesCalculator->GetFeatures());
