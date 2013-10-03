@@ -30,7 +30,6 @@ class ITK_EXPORT ScalarImageToHaralickTextureFeaturesImageFilter:
 public:
   typedef TInputImageType                                            InputImageType;
   typedef TFeatureType                                               FeatureType;
-  typedef VariableLengthVector< FeatureType >                        OutputPixelType;
   typedef VectorImage< TFeatureType, InputImageType::ImageDimension> OutputImageType;
 
   typedef ScalarImageToHaralickTextureFeaturesImageFilter            Self;
@@ -168,8 +167,6 @@ public:
       {
       windowSize.SetElement(i, (m_WindowRadius.GetElement(i) << 1) + 1);
       }
-
-    OutputPixelType features;
 
     output->SetBufferedRegion( output->GetRequestedRegion() );
     output->Allocate();
