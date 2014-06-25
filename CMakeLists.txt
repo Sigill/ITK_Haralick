@@ -13,11 +13,8 @@ include(${ITK_USE_FILE})
 include_directories(BEFORE "${CMAKE_SOURCE_DIR}/include")
 include_directories(BEFORE "${CMAKE_SOURCE_DIR}/test")
 
-
-FIND_PACKAGE(Valgrind REQUIRED)
-
-INCLUDE_DIRECTORIES(${VALGRIND_INCLUDE_DIR})
-
+#FIND_PACKAGE(Valgrind REQUIRED)
+#INCLUDE_DIRECTORIES(${VALGRIND_INCLUDE_DIR})
 
 SET(INSTALL_DIR_MESSAGE "(If relative, will be appended to CMAKE_INSTALL_PREFIX)" CACHE INTERNAL "Internal message")
 SET(INSTALL_DIR_INCLUDE "include" CACHE PATH "Installation directory for header files ${INSTALL_DIR_MESSAGE}")
