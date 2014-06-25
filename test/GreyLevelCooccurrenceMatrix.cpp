@@ -25,8 +25,8 @@ bool assertTotalCountIs(const GreyLevelCooccurrenceMatrix * const m, const GreyL
 
 bool assertIsZeroEverywhere(const GreyLevelCooccurrenceMatrix * const m)
 {
-  typename GreyLevelCooccurrenceMatrix::ConstIterator it = m->Begin(), end = m->End();
-  typename GreyLevelCooccurrenceMatrix::MeasurementType zero = itk::NumericTraits< GreyLevelCooccurrenceMatrix::MeasurementType >::Zero;
+  GreyLevelCooccurrenceMatrix::ConstIterator it = m->Begin(), end = m->End();
+  GreyLevelCooccurrenceMatrix::MeasurementType zero = itk::NumericTraits< GreyLevelCooccurrenceMatrix::MeasurementType >::Zero;
 
   while(it != end)
   {
@@ -62,8 +62,8 @@ int main(void) {
   if(!assertTotalCountIs(matrix, 1))
     exit(-1);
 
-  typename GreyLevelCooccurrenceMatrix::ConstIterator it = matrix->Begin(), begin = matrix->Begin(), end = matrix->End();
-  typename GreyLevelCooccurrenceMatrix::IndexType i1, i2;
+  GreyLevelCooccurrenceMatrix::ConstIterator it = matrix->Begin(), begin = matrix->Begin(), end = matrix->End();
+  GreyLevelCooccurrenceMatrix::IndexType i1, i2;
   while(it != end)
   {
     matrix->GetIndexes(it - begin, &i1, &i2);

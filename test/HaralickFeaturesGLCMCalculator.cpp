@@ -81,7 +81,7 @@ void CreateImage(ImageType::Pointer image)
 	imageIt.Set(ind[1] % 2);
   }
 
-  typename WriterType::Pointer writer = WriterType::New();
+  WriterType::Pointer writer = WriterType::New();
   writer->SetInput(image);
   writer->SetFileName("out.bmp");
   writer->Update();

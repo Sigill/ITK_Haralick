@@ -71,7 +71,7 @@ HaralickFeaturesGLCMCalculator< TGLCMType, TFeatureType >
       marginal_x_stats_computer.insert(i1, frequency);
       marginal_y_stats_computer.insert(i2, frequency);
       sum_occurrences[i1+i2] += frequency;
-      diff_occurrences[abs(i1-i2)] += frequency;
+      diff_occurrences[vnl_math_abs(i1-i2)] += frequency;
 
       angularSecondMoment += frequency * frequency;
       entropy -= ( frequency > NumericTraits< FeatureType >::Zero ) ? frequency *vcl_log(frequency) / log2 : 0;
@@ -118,10 +118,10 @@ HaralickFeaturesGLCMCalculator< TGLCMType, TFeatureType >
   m_Features[3] = inverseDifferenceMoment;
   m_Features[4] = sumAverage / (2 * maxGreylevel);
   m_Features[5] = sumVariance / (maxGreylevel * maxGreylevel);
-  m_Features[6] = sumEntropy / (vcl_log(2 * matrixSize - 1) / log2);
-  m_Features[7] = entropy / (2*vcl_log(matrixSize) / log2);
+  m_Features[6] = sumEntropy / (vcl_log((FeatureType)(2 * matrixSize - 1)) / log2);
+  m_Features[7] = entropy / (2*vcl_log((FeatureType)matrixSize) / log2);
   m_Features[8] = differenceVariance * 4.0 / (maxGreylevel  * maxGreylevel);
-  m_Features[9] = differenceEntropy / (vcl_log(matrixSize) / log2);
+  m_Features[9] = differenceEntropy / (vcl_log((FeatureType)matrixSize) / log2);
 }
 
 template< typename TGLCMType, typename TFeatureType >

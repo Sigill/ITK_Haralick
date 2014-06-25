@@ -12,8 +12,8 @@ const unsigned int D = 2;
 
 typedef itk::Image<unsigned char, D> ImageType;
 typedef itk::ImageRegionIteratorWithIndex< ImageType > ImageIterator;
-typedef typename itk::Statistics::ScalarImageToHaralickTextureFeaturesImageFilter< ImageType, double > ScalarImageToHaralickTextureFeaturesImageFilter;
-typedef typename ScalarImageToHaralickTextureFeaturesImageFilter::OutputImageType HaralickImageType;
+typedef itk::Statistics::ScalarImageToHaralickTextureFeaturesImageFilter< ImageType, double > ScalarImageToHaralickTextureFeaturesImageFilter;
+typedef ScalarImageToHaralickTextureFeaturesImageFilter::OutputImageType HaralickImageType;
 
 int main(int argc, char **argv)
 {
@@ -52,19 +52,19 @@ int main(int argc, char **argv)
 
   typedef itk::RescaleIntensityImageFilter<ImageType, ImageType> RescaleFilter;
 
-  typename RescaleFilter::Pointer rescaler = RescaleFilter::New();
+  RescaleFilter::Pointer rescaler = RescaleFilter::New();
   rescaler->SetInput(reader->GetOutput());
   rescaler->SetOutputMinimum(0);
   rescaler->SetOutputMaximum(7);
 
-  typename ScalarImageToHaralickTextureFeaturesImageFilter::Pointer haralickComputer = ScalarImageToHaralickTextureFeaturesImageFilter::New();
-  typename ScalarImageToHaralickTextureFeaturesImageFilter::RadiusType windowRadius; windowRadius.Fill(3);
+  ScalarImageToHaralickTextureFeaturesImageFilter::Pointer haralickComputer = ScalarImageToHaralickTextureFeaturesImageFilter::New();
+  ScalarImageToHaralickTextureFeaturesImageFilter::RadiusType windowRadius; windowRadius.Fill(3);
   haralickComputer->SetInput(rescaler->GetOutput());
   haralickComputer->SetWindowRadius(windowRadius);
   haralickComputer->SetNumberOfBinsPerAxis(8);
 
-  typename ScalarImageToHaralickTextureFeaturesImageFilter::OffsetType offset1 = {{0, 1}};
-  typename ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::Pointer offsetV = ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::New();
+  ScalarImageToHaralickTextureFeaturesImageFilter::OffsetType offset1 = {{0, 1}};
+  ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::Pointer offsetV = ScalarImageToHaralickTextureFeaturesImageFilter::OffsetVectorType::New();
   offsetV->push_back(offset1);
   haralickComputer->SetOffsets(offsetV);
 

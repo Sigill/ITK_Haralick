@@ -17,7 +17,7 @@ typedef itk::ConstNeighborhoodIterator< ImageType > NeighborhoodIterator;
 
 typedef ImageType::OffsetType OffsetType;
 typedef itk::VectorContainer< unsigned char, OffsetType > OffsetVector;
-typedef typename OffsetVector::Pointer OffsetVectorPointer;
+typedef OffsetVector::Pointer OffsetVectorPointer;
 
 typedef itk::Statistics::GreyLevelCooccurrenceMatrix< unsigned int > GreyLevelCooccurrenceMatrixType;
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 
   std::cout << "Window size: " << windowSize << std::endl;
 
-  typename GreyLevelCooccurrenceMatrixType::Pointer cooccurrenceMatrix = GreyLevelCooccurrenceMatrixType::New();
+  GreyLevelCooccurrenceMatrixType::Pointer cooccurrenceMatrix = GreyLevelCooccurrenceMatrixType::New();
   cooccurrenceMatrix->SetSize(16);
 
   ImageType::IndexType pixelIndex;
