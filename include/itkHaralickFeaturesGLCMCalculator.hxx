@@ -71,10 +71,10 @@ HaralickFeaturesGLCMCalculator< TGLCMType, TFeatureType >
       marginal_x_stats_computer.insert(i1, frequency);
       marginal_y_stats_computer.insert(i2, frequency);
       sum_occurrences[i1+i2] += frequency;
-      diff_occurrences[vnl_math_abs(i1-i2)] += frequency;
+      diff_occurrences[vnl_math_abs((int)(i1)-(int)(i2))] += frequency;
 
       angularSecondMoment += frequency * frequency;
-      entropy -= ( frequency > NumericTraits< FeatureType >::Zero ) ? frequency *vcl_log(frequency) / log2 : 0;
+      entropy -= ( frequency > NumericTraits< FeatureType >::Zero ) ? frequency * vcl_log(frequency) / log2 : 0;
       inverseDifferenceMoment += frequency / (1 + (i1 - i2) * (i1 - i2));
       }
     ++cooc_it;
