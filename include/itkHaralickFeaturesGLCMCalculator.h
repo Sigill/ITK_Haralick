@@ -18,10 +18,12 @@ namespace Statistics
  * GLCMImageCalculator is templated over the type of cooccurrence
  * matrix and the type of the features computed (floating point).
  *
- * The algorithm return a VariableLenggthVector containing 
- * the following features: energy, entropy, correlation, inverse 
- * difference moment, inertia, cluster shade, cluster prominence
- * and haralick correlation.
+ * The algorithm return a VariableLengthVector containing 
+ * the following features: angular second moment, contrast, variance,
+ * inverse difference moment, sum average, sum variance, sum entropy,
+ * entropy, difference variance and difference entropy.
+
+
  */
 template< typename TGLCMType, typename TFeatureType >
 class ITK_EXPORT HaralickFeaturesGLCMCalculator : public Object
